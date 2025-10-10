@@ -1534,7 +1534,10 @@ def show_proposal_page():
         </script>
         ''', unsafe_allow_html=True)
     
-    proposal_html = """
+    # Inserir foto 37 no HTML
+    photo_37_data = background_image if background_image else ""
+    
+    proposal_html = f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -1602,14 +1605,18 @@ def show_proposal_page():
                 100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
             }
             
-            #proposal-container {
+            #proposal-container {{
                 text-align: center;
                 color: white;
                 padding: 60px;
                 max-width: 900px;
                 position: relative;
                 z-index: 10;
-                background: rgba(255, 255, 255, 0.05);
+                background: 
+                    linear-gradient(rgba(255, 154, 158, 0.7), rgba(252, 182, 159, 0.7)),
+                    url('{photo_37_data}');
+                background-size: cover;
+                background-position: center;
                 backdrop-filter: blur(8px);
                 border-radius: 40px;
                 border: 3px solid rgba(255, 255, 255, 0.6);
@@ -1618,7 +1625,7 @@ def show_proposal_page():
                     inset 0 0 30px rgba(255, 255, 255, 0.1);
                 opacity: 0;
                 animation: fadeInProposal 2s forwards;
-            }
+            }}
             
             @keyframes fadeInProposal {
                 from {

@@ -1471,6 +1471,21 @@ def show_quiz_page():
 def show_proposal_page():
     """Página do pedido de casamento"""
     
+    # Carregar música "De Janeiro a Janeiro"
+    music_dir = "music"
+    music_files = get_music_files(music_dir)
+    janeiro_music = None
+    
+    for music_file in music_files:
+        if "Janeiro" in music_file or "janeiro" in music_file:
+            try:
+                with open(music_file, "rb") as audio_file:
+                    audio_bytes = audio_file.read()
+                    janeiro_music = base64.b64encode(audio_bytes).decode()
+                break
+            except Exception as e:
+                print(f"Erro ao carregar música: {e}")
+    
     # CSS para fundo romântico
     st.markdown("""
     <style>
@@ -1488,6 +1503,23 @@ def show_proposal_page():
         }
     </style>
     """, unsafe_allow_html=True)
+    
+    # Player de música específica para esta página
+    if janeiro_music:
+        st.markdown(f'''
+        <audio id="proposal-music" autoplay loop style="display: none;">
+            <source src="data:audio/mpeg;base64,{janeiro_music}" type="audio/mpeg">
+        </audio>
+        <script>
+            // Garantir que a música toque
+            setTimeout(() => {{
+                const audio = document.getElementById('proposal-music');
+                if (audio) {{
+                    audio.play().catch(e => console.log('Autoplay bloqueado:', e));
+                }}
+            }}, 100);
+        </script>
+        ''', unsafe_allow_html=True)
     
     proposal_html = """
     <!DOCTYPE html>
@@ -1753,9 +1785,86 @@ def show_proposal_page():
         
         if st.button("💕 SIM! EU ACEITO! 💕", key="yes_btn", use_container_width=True):
             st.session_state.proposal_answer = 'yes'
+            
+            # Múltiplos efeitos de comemoração
             st.balloons()
-            st.success("🎉 AAHHH QUE FELICIDADE! VOCÊ DISSE SIM! 💍💕✨")
-            time.sleep(3)
+            st.snow()
+            
+            # Mensagem de celebração com emojis
+            celebration_html = """
+            <div style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 99999;
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 105, 180, 0.95));
+                backdrop-filter: blur(20px);
+                border-radius: 40px;
+                border: 5px solid white;
+                padding: 80px;
+                text-align: center;
+                box-shadow: 0 30px 90px rgba(0,0,0,0.5);
+                animation: celebrationPop 0.6s ease-out;
+            ">
+                <h1 style="
+                    font-family: 'Great Vibes', cursive;
+                    font-size: 72px;
+                    color: white;
+                    text-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+                    margin: 20px 0;
+                    animation: textBounce 1s ease-in-out infinite;
+                ">
+                    🎉 ELA DISSE SIM! 🎉
+                </h1>
+                <div style="
+                    font-size: 80px;
+                    margin: 30px 0;
+                    animation: emojiSpin 2s linear infinite;
+                ">
+                    💍 💕 🎊 ✨ 🥳 🎆 💖 🎈
+                </div>
+                <p style="
+                    font-family: 'Dancing Script', cursive;
+                    font-size: 48px;
+                    color: white;
+                    text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+                    margin: 20px 0;
+                ">
+                    AAHHH QUE FELICIDADE!<br>
+                    VAMOS CASAR! 💍💕✨
+                </p>
+            </div>
+            
+            <style>
+                @keyframes celebrationPop {
+                    0% { 
+                        transform: translate(-50%, -50%) scale(0.3); 
+                        opacity: 0; 
+                    }
+                    50% { 
+                        transform: translate(-50%, -50%) scale(1.1); 
+                    }
+                    100% { 
+                        transform: translate(-50%, -50%) scale(1); 
+                        opacity: 1; 
+                    }
+                }
+                
+                @keyframes textBounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
+                }
+                
+                @keyframes emojiSpin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+            """
+            
+            st.markdown(celebration_html, unsafe_allow_html=True)
+            time.sleep(5)
             st.rerun()
 
 def show_gallery_page():
@@ -2164,12 +2273,99 @@ def show_gallery_page():
     # Renderizar carrossel
     components.html(carousel_html, height=800, scrolling=False)
     
-    # Botão para ir ao pedido de casamento
+    # Sistema de cliques para ir ao pedido
+    if 'click_count' not in st.session_state:
+        st.session_state.click_count = 0
+    
+    import random
+    
+    # Gerar posição aleatória para o botão
+    if 'button_position' not in st.session_state:
+        st.session_state.button_position = {'top': random.randint(10, 80), 'left': random.randint(10, 80)}
+    
+    # HTML com botão em posição aleatória
+    button_html = f"""
+    <style>
+        #random-button {{
+            position: fixed;
+            top: {st.session_state.button_position['top']}%;
+            left: {st.session_state.button_position['left']}%;
+            z-index: 9999;
+            background: linear-gradient(135deg, #ff6b9d, #c06c84);
+            color: white;
+            border: 3px solid white;
+            border-radius: 25px;
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Dancing Script', cursive;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
+            animation: buttonPulse 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }}
+        
+        #random-button:hover {{
+            transform: scale(1.1);
+            box-shadow: 0 12px 48px rgba(255, 105, 180, 0.7);
+        }}
+        
+        @keyframes buttonPulse {{
+            0%, 100% {{ transform: scale(1); }}
+            50% {{ transform: scale(1.05); }}
+        }}
+        
+        #click-counter {{
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9998;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: 2px solid #ff6b9d;
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            color: #ff6b9d;
+            font-weight: bold;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }}
+    </style>
+    
+    <div id="click-counter">
+        💕 Cliques: {st.session_state.click_count}/3
+    </div>
+    
+    <button id="random-button" onclick="handleClick()">
+        💍 Clique Aqui 💍
+    </button>
+    
+    <script>
+        function handleClick() {{
+            // Enviar sinal para Streamlit via query param
+            window.parent.postMessage({{type: 'streamlit:setComponentValue', value: 'clicked'}}, '*');
+        }}
+    </script>
+    """
+    
+    st.markdown(button_html, unsafe_allow_html=True)
+    
+    # Adicionar botão Streamlit invisível para capturar cliques
     st.markdown("<br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("💍 Ir para o Grande Momento 💍", key="go_proposal", use_container_width=True):
+    if st.button("🎯 Clique Secreto", key="secret_click"):
+        st.session_state.click_count += 1
+        
+        # Mudar posição do botão aleatoriamente
+        st.session_state.button_position = {
+            'top': random.randint(10, 80), 
+            'left': random.randint(10, 80)
+        }
+        
+        if st.session_state.click_count >= 3:
             st.session_state.page = 'proposal'
+            st.session_state.click_count = 0  # Reset
+            st.rerun()
+        else:
             st.rerun()
 
 if __name__ == "__main__":

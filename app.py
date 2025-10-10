@@ -1617,13 +1617,13 @@ def show_proposal_page():
                 max-width: 900px;
                 position: relative;
                 z-index: 10;
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(15px);
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(8px);
                 border-radius: 40px;
-                border: 3px solid rgba(255, 255, 255, 0.4);
+                border: 3px solid rgba(255, 255, 255, 0.6);
                 box-shadow: 
-                    0 15px 60px rgba(255, 105, 180, 0.4),
-                    inset 0 0 30px rgba(255, 255, 255, 0.2);
+                    0 15px 60px rgba(0, 0, 0, 0.3),
+                    inset 0 0 30px rgba(255, 255, 255, 0.1);
                 opacity: 0;
                 animation: fadeInProposal 2s forwards;
             }
@@ -2300,49 +2300,33 @@ def show_gallery_page():
     # Renderizar carrossel
     components.html(carousel_html, height=800, scrolling=False)
     
-    # Sistema de cliques para ir ao pedido
+    # Sistema de cliques para ir ao pedido - aparece após última foto
     if 'click_count' not in st.session_state:
         st.session_state.click_count = 0
+    if 'last_photo_seen' not in st.session_state:
+        st.session_state.last_photo_seen = False
     
     import random
     
     # Gerar posição aleatória para o botão
     if 'button_position' not in st.session_state:
-        st.session_state.button_position = {'top': random.randint(10, 80), 'left': random.randint(10, 80)}
+        st.session_state.button_position = {'top': random.randint(15, 75), 'left': random.randint(15, 75)}
     
-    # HTML com botão em posição aleatória
-    button_html = f"""
-    <style>
-        #random-button {{
-            position: fixed;
-            top: {st.session_state.button_position['top']}%;
-            left: {st.session_state.button_position['left']}%;
-            z-index: 9999;
-            background: linear-gradient(135deg, #ff6b9d, #c06c84);
-            color: white;
-            border: 3px solid white;
-            border-radius: 25px;
-            padding: 20px 40px;
-            font-size: 24px;
-            font-weight: bold;
-            font-family: 'Dancing Script', cursive;
-            cursor: pointer;
-            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
-            animation: buttonPulse 2s ease-in-out infinite;
-            transition: all 0.3s ease;
-        }}
-        
-        #random-button:hover {{
-            transform: scale(1.1);
-            box-shadow: 0 12px 48px rgba(255, 105, 180, 0.7);
-        }}
-        
-        @keyframes buttonPulse {{
-            0%, 100% {{ transform: scale(1); }}
-            50% {{ transform: scale(1.05); }}
-        }}
-        
-        #click-counter {{
+    # Botão aparece apenas após ver a última foto
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Checkbox escondido para detectar visualização da última foto
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("📸 Vi todas as fotos!", key="saw_all_photos", use_container_width=True):
+            st.session_state.last_photo_seen = True
+            st.rerun()
+    
+    # Mostrar botão apenas se viu todas as fotos
+    if st.session_state.last_photo_seen:
+        # Contador de cliques
+        st.markdown(f"""
+        <div style="
             position: fixed;
             top: 20px;
             right: 20px;
@@ -2356,44 +2340,68 @@ def show_gallery_page():
             color: #ff6b9d;
             font-weight: bold;
             box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-        }}
-    </style>
-    
-    <div id="click-counter">
-        💕 Cliques: {st.session_state.click_count}/3
-    </div>
-    
-    <button id="random-button" onclick="handleClick()">
-        💍 Clique Aqui 💍
-    </button>
-    
-    <script>
-        function handleClick() {{
-            // Enviar sinal para Streamlit via query param
-            window.parent.postMessage({{type: 'streamlit:setComponentValue', value: 'clicked'}}, '*');
-        }}
-    </script>
-    """
-    
-    st.markdown(button_html, unsafe_allow_html=True)
-    
-    # Adicionar botão Streamlit invisível para capturar cliques
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    if st.button("🎯 Clique Secreto", key="secret_click"):
-        st.session_state.click_count += 1
+        ">
+            💕 Cliques: {st.session_state.click_count}/2
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Mudar posição do botão aleatoriamente
-        st.session_state.button_position = {
-            'top': random.randint(10, 80), 
-            'left': random.randint(10, 80)
-        }
+        # Botão em posição aleatória
+        button_html = f"""
+        <style>
+            #random-button {{
+                position: fixed;
+                top: {st.session_state.button_position['top']}%;
+                left: {st.session_state.button_position['left']}%;
+                z-index: 9999;
+                background: linear-gradient(135deg, #ff6b9d, #c06c84);
+                color: white;
+                border: 3px solid white;
+                border-radius: 25px;
+                padding: 25px 50px;
+                font-size: 28px;
+                font-weight: bold;
+                font-family: 'Dancing Script', cursive;
+                cursor: pointer;
+                box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
+                animation: buttonPulse 2s ease-in-out infinite;
+                transition: all 0.3s ease;
+            }}
+            
+            #random-button:hover {{
+                transform: scale(1.1);
+                box-shadow: 0 12px 48px rgba(255, 105, 180, 0.7);
+            }}
+            
+            @keyframes buttonPulse {{
+                0%, 100% {{ transform: scale(1); }}
+                50% {{ transform: scale(1.08); }}
+            }}
+        </style>
         
-        if st.session_state.click_count >= 3:
-            st.session_state.page = 'proposal'
-            st.session_state.click_count = 0  # Reset
-            st.rerun()
-        else:
-            st.rerun()
+        <button id="random-button">
+            💍 Clique Aqui 💍
+        </button>
+        """
+        
+        st.markdown(button_html, unsafe_allow_html=True)
+        
+        # Botão Streamlit para capturar cliques
+        if st.button("🎯", key="secret_click_btn"):
+            st.session_state.click_count += 1
+            
+            # Na 3ª vez (após 2 cliques), vai para o pedido
+            if st.session_state.click_count >= 2:
+                st.session_state.page = 'proposal'
+                st.session_state.click_count = 0  # Reset
+                st.session_state.last_photo_seen = False  # Reset
+                st.rerun()
+            else:
+                # Mudar posição do botão aleatoriamente
+                st.session_state.button_position = {
+                    'top': random.randint(15, 75), 
+                    'left': random.randint(15, 75)
+                }
+                st.rerun()
 
 if __name__ == "__main__":
     main()

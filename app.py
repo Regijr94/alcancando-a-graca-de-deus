@@ -213,8 +213,15 @@ def main():
         show_quiz_page()
         return
     
-    # Página principal (galeria)
-    show_gallery_page()
+    # Página da galeria
+    if st.session_state.page == 'gallery':
+        show_gallery_page()
+        return
+    
+    # Página do pedido de casamento
+    if st.session_state.page == 'proposal':
+        show_proposal_page()
+        return
 
 def show_intro_page():
     """Página de introdução com mensagem animada e tema romântico"""
@@ -1461,6 +1468,296 @@ def show_quiz_page():
             st.session_state.quiz_show_result = True
             st.rerun()
 
+def show_proposal_page():
+    """Página do pedido de casamento"""
+    
+    # CSS para fundo romântico
+    st.markdown("""
+    <style>
+        .stApp {
+            background: linear-gradient(135deg, 
+                #ff9a9e 0%, 
+                #fecfef 20%, 
+                #ffecd2 40%, 
+                #fcb69f 60%, 
+                #ff9a9e 80%, 
+                #fecfef 100%
+            ) !important;
+            background-size: 400% 400% !important;
+            animation: gradientShift 25s ease infinite !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    proposal_html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+                background: linear-gradient(135deg, 
+                    #ff9a9e 0%, 
+                    #fecfef 20%, 
+                    #ffecd2 40%, 
+                    #fcb69f 60%, 
+                    #ff9a9e 80%, 
+                    #fecfef 100%
+                );
+                background-size: 400% 400%;
+                animation: gradientShift 25s ease infinite;
+                height: 100vh;
+                width: 100vw;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                position: relative;
+            }
+            
+            @keyframes gradientShift {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            
+            /* Corações flutuantes */
+            .heart {
+                position: absolute;
+                font-size: 40px;
+                opacity: 0;
+                animation: floatHearts 15s ease-in-out infinite;
+                pointer-events: none;
+                filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.6));
+            }
+            
+            .heart:nth-child(1) { left: 10%; animation-delay: 0s; }
+            .heart:nth-child(2) { left: 20%; animation-delay: 2s; }
+            .heart:nth-child(3) { left: 30%; animation-delay: 4s; }
+            .heart:nth-child(4) { left: 40%; animation-delay: 1s; }
+            .heart:nth-child(5) { left: 50%; animation-delay: 3s; }
+            .heart:nth-child(6) { left: 60%; animation-delay: 5s; }
+            .heart:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+            .heart:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+            .heart:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+            .heart:nth-child(10) { left: 15%; animation-delay: 6s; }
+            
+            @keyframes floatHearts {
+                0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+                10% { opacity: 0.8; }
+                90% { opacity: 0.8; }
+                100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+            }
+            
+            #proposal-container {
+                text-align: center;
+                color: white;
+                padding: 60px;
+                max-width: 900px;
+                position: relative;
+                z-index: 10;
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(15px);
+                border-radius: 40px;
+                border: 3px solid rgba(255, 255, 255, 0.4);
+                box-shadow: 
+                    0 15px 60px rgba(255, 105, 180, 0.4),
+                    inset 0 0 30px rgba(255, 255, 255, 0.2);
+                opacity: 0;
+                animation: fadeInProposal 2s forwards;
+            }
+            
+            @keyframes fadeInProposal {
+                from {
+                    opacity: 0;
+                    transform: scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+            
+            #message {
+                font-family: 'Great Vibes', cursive;
+                font-size: 52px;
+                line-height: 1.6;
+                text-shadow: 
+                    3px 3px 8px rgba(0,0,0,0.5),
+                    0 0 40px rgba(255, 182, 193, 0.8);
+                color: #fff;
+                font-weight: 700;
+                margin-bottom: 40px;
+                animation: textGlow 3s ease-in-out infinite;
+            }
+            
+            @keyframes textGlow {
+                0%, 100% { text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 0 0 40px rgba(255, 182, 193, 0.8); }
+                50% { text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 0 0 60px rgba(255, 105, 180, 1); }
+            }
+            
+            #ring {
+                font-size: 120px;
+                margin: 30px 0;
+                animation: ringBounce 2s ease-in-out infinite;
+                display: inline-block;
+            }
+            
+            @keyframes ringBounce {
+                0%, 100% { transform: translateY(0) rotate(0deg); }
+                25% { transform: translateY(-20px) rotate(-10deg); }
+                75% { transform: translateY(-10px) rotate(10deg); }
+            }
+            
+            #question {
+                font-family: 'Dancing Script', cursive;
+                font-size: 68px;
+                font-weight: 700;
+                color: #fff;
+                text-shadow: 
+                    4px 4px 10px rgba(0,0,0,0.6),
+                    0 0 50px rgba(255, 182, 193, 1);
+                margin: 40px 0;
+                animation: pulse 2s ease-in-out infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+            
+            .sparkle {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 0 10px white;
+                animation: sparkleAnim 2s ease-in-out infinite;
+            }
+            
+            @keyframes sparkleAnim {
+                0%, 100% { opacity: 0; transform: scale(0); }
+                50% { opacity: 1; transform: scale(1); }
+            }
+            
+            /* Responvidade */
+            @media (max-width: 768px) {
+                #proposal-container {
+                    padding: 40px 30px;
+                    max-width: 95%;
+                }
+                #message {
+                    font-size: 36px;
+                }
+                #ring {
+                    font-size: 80px;
+                }
+                #question {
+                    font-size: 48px;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                #message {
+                    font-size: 28px;
+                }
+                #ring {
+                    font-size: 60px;
+                }
+                #question {
+                    font-size: 38px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Corações flutuantes -->
+        <div class="heart">💕</div>
+        <div class="heart">❤️</div>
+        <div class="heart">💖</div>
+        <div class="heart">💗</div>
+        <div class="heart">💕</div>
+        <div class="heart">❤️</div>
+        <div class="heart">💖</div>
+        <div class="heart">💗</div>
+        <div class="heart">💕</div>
+        <div class="heart">❤️</div>
+        
+        <div id="proposal-container">
+            <p id="message">
+                Beatriz, meu amor,<br>
+                Você ilumina minha vida todos os dias.<br>
+                Esses anos ao seu lado foram os melhores da minha vida.
+            </p>
+            
+            <div id="ring">💍</div>
+            
+            <h1 id="question">QUER CASAR COMIGO?</h1>
+        </div>
+        
+        <!-- Sparkles -->
+        <div class="sparkle" style="top: 20%; left: 15%;"></div>
+        <div class="sparkle" style="top: 40%; right: 20%; animation-delay: 0.5s;"></div>
+        <div class="sparkle" style="bottom: 30%; left: 25%; animation-delay: 1s;"></div>
+        <div class="sparkle" style="top: 60%; right: 30%; animation-delay: 1.5s;"></div>
+        
+        <script>
+            // Adicionar mais sparkles aleatoriamente
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(sparkle);
+            }
+        </script>
+    </body>
+    </html>
+    """
+    
+    # Renderizar página do pedido
+    components.html(proposal_html, height=800, scrolling=False)
+    
+    # Botões de resposta
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown("""
+        <style>
+            div.stButton > button {
+                width: 100%;
+                height: 80px;
+                font-size: 32px;
+                font-weight: bold;
+                border-radius: 20px;
+                margin: 10px 0;
+            }
+            div.stButton > button:first-child {
+                background: linear-gradient(135deg, #ff6b9d, #c06c84);
+                color: white;
+                border: 3px solid #fff;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        if st.button("💕 SIM! EU ACEITO! 💕", key="yes_btn", use_container_width=True):
+            st.session_state.proposal_answer = 'yes'
+            st.balloons()
+            st.success("🎉 AAHHH QUE FELICIDADE! VOCÊ DISSE SIM! 💍💕✨")
+            time.sleep(3)
+            st.rerun()
+
 def show_gallery_page():
     """Página principal com galeria e contador"""
     # Diretórios
@@ -1866,6 +2163,14 @@ def show_gallery_page():
     
     # Renderizar carrossel
     components.html(carousel_html, height=800, scrolling=False)
+    
+    # Botão para ir ao pedido de casamento
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("💍 Ir para o Grande Momento 💍", key="go_proposal", use_container_width=True):
+            st.session_state.page = 'proposal'
+            st.rerun()
 
 if __name__ == "__main__":
     main()

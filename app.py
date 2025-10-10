@@ -1486,8 +1486,27 @@ def show_proposal_page():
             except Exception as e:
                 print(f"Erro ao carregar música: {e}")
     
-    # CSS para fundo romântico
-    st.markdown("""
+    # Carregar foto 37 como fundo
+    background_image = None
+    background_path = "pictures/37.jpeg"
+    try:
+        background_image = image_to_base64(background_path)
+    except Exception as e:
+        print(f"Erro ao carregar foto de fundo: {e}")
+    
+    # CSS para fundo com foto
+    background_css = f"""
+    <style>
+        .stApp {{
+            background: 
+                linear-gradient(rgba(255, 154, 158, 0.6), rgba(252, 182, 159, 0.6)),
+                url('{background_image}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+        }}
+    </style>
+    """ if background_image else """
     <style>
         .stApp {
             background: linear-gradient(135deg, 
@@ -1502,7 +1521,9 @@ def show_proposal_page():
             animation: gradientShift 25s ease infinite !important;
         }
     </style>
-    """, unsafe_allow_html=True)
+    """
+    
+    st.markdown(background_css, unsafe_allow_html=True)
     
     # Player de música específica para esta página
     if janeiro_music:
@@ -2236,6 +2257,12 @@ def show_gallery_page():
                 }}
                 
                 current = index;
+                
+                // Verificar se chegou na última foto
+                if (index === total - 1) {{
+                    // Notificar que chegou na última foto
+                    localStorage.setItem('lastPhotoReached', 'true');
+                }}
             }}
             
             function next() {{

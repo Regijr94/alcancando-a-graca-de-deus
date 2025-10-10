@@ -1945,6 +1945,37 @@ def show_gallery_page():
                 font-weight: bold;
                 transition: color 0.3s;
             }}
+            
+            /* Responsivo para celular */
+            @media (max-width: 768px) {{
+                h2 {{
+                    font-size: 18px;
+                }}
+                .subtitle {{
+                    font-size: 12px;
+                }}
+                #time-display {{
+                    font-size: 16px;
+                }}
+                .counter-container {{
+                    padding: 15px 10px;
+                }}
+            }}
+            
+            @media (max-width: 480px) {{
+                h2 {{
+                    font-size: 16px;
+                }}
+                .subtitle {{
+                    font-size: 11px;
+                }}
+                #time-display {{
+                    font-size: 14px;
+                }}
+                .counter-container {{
+                    padding: 12px 8px;
+                }}
+            }}
         </style>
     </head>
     <body>
@@ -2232,6 +2263,32 @@ def show_gallery_page():
             }}
             .progress-hidden {{
                 display: none;
+            }}
+            
+            /* Responsivo para celular - Barra de Progresso */
+            @media (max-width: 768px) {{
+                #progress-container {{
+                    padding: 10px 15px;
+                }}
+                #progress-bar {{
+                    height: 25px;
+                }}
+                #progress-fill {{
+                    font-size: 14px;
+                }}
+            }}
+            
+            @media (max-width: 480px) {{
+                #progress-container {{
+                    padding: 8px 10px;
+                }}
+                #progress-bar {{
+                    height: 20px;
+                    border-radius: 10px;
+                }}
+                #progress-fill {{
+                    font-size: 12px;
+                }}
             }}
         </style>
     </head>

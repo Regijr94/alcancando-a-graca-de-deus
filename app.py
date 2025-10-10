@@ -2068,7 +2068,6 @@ def show_gallery_page():
     
     # Converter mídias para base64 (limitando para não sobrecarregar)
     total_media = len(media_files)
-    st.info(f"📸 Carregando {len(image_files)} fotos e {len(video_files)} vídeos...")
     
     # Criar lista de mídias com tipo e conteúdo base64
     media_list = []
@@ -2199,9 +2198,54 @@ def show_gallery_page():
                 right: 200px;
                 z-index: 100;
             }}
+            #progress-container {{
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 200;
+                background: rgba(0, 0, 0, 0.8);
+                padding: 20px;
+            }}
+            #progress-bar {{
+                width: 100%;
+                height: 30px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 15px;
+                overflow: hidden;
+                border: 2px solid rgba(255, 255, 255, 0.5);
+            }}
+            #progress-fill {{
+                height: 100%;
+                background: linear-gradient(90deg, #ff6b9d, #feca57, #48dbfb, #ff6b9d);
+                background-size: 200% 100%;
+                animation: progressGradient 3s ease infinite;
+                transition: width 0.5s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                font-size: 16px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }}
+            @keyframes progressGradient {{
+                0% {{ background-position: 0% 50%; }}
+                50% {{ background-position: 100% 50%; }}
+                100% {{ background-position: 0% 50%; }}
+            }}
+            .progress-hidden {{
+                display: none;
+            }}
         </style>
     </head>
     <body>
+        <div id="progress-container">
+            <div id="progress-bar">
+                <div id="progress-fill" style="width: 0%;">0%</div>
+            </div>
+        </div>
+        
         <div id="carousel-container">
             {''.join([
                 f'<video class="carousel-video" id="media-{i}" controls muted loop><source src="{m["data"]}" type="{m["mime"]}"></video>' 
@@ -2225,6 +2269,23 @@ def show_gallery_page():
             let current = 0;
             let total = {len(media_list)};
             const verses = {poesia_versos};
+            
+            function updateProgress() {{
+                const progress = Math.round(((current + 1) / total) * 100);
+                const progressFill = document.getElementById('progress-fill');
+                const progressContainer = document.getElementById('progress-container');
+                
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+                
+                // Quando chegar em 100%, esconder barra após 2 segundos
+                if (progress === 100) {{
+                    setTimeout(() => {{
+                        progressContainer.classList.add('progress-hidden');
+                        localStorage.setItem('lastPhotoReached', 'true');
+                    }}, 2000);
+                }}
+            }}
             
             function show(index) {{
                 // Pausar todos os vídeos e remover classe active
@@ -2258,11 +2319,8 @@ def show_gallery_page():
                 
                 current = index;
                 
-                // Verificar se chegou na última foto
-                if (index === total - 1) {{
-                    // Notificar que chegou na última foto
-                    localStorage.setItem('lastPhotoReached', 'true');
-                }}
+                // Atualizar barra de progresso
+                updateProgress();
             }}
             
             function next() {{
@@ -2300,11 +2358,11 @@ def show_gallery_page():
     # Renderizar carrossel
     components.html(carousel_html, height=800, scrolling=False)
     
-    # Sistema de cliques para ir ao pedido - aparece após última foto
+    # Sistema de cliques para ir ao pedido - aparece após 100% da barra
     if 'click_count' not in st.session_state:
         st.session_state.click_count = 0
-    if 'last_photo_seen' not in st.session_state:
-        st.session_state.last_photo_seen = False
+    if 'progress_complete' not in st.session_state:
+        st.session_state.progress_complete = False
     
     import random
     
@@ -2312,18 +2370,27 @@ def show_gallery_page():
     if 'button_position' not in st.session_state:
         st.session_state.button_position = {'top': random.randint(15, 75), 'left': random.randint(15, 75)}
     
-    # Botão aparece apenas após ver a última foto
+    # Botão aparece apenas após barra chegar em 100%
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Checkbox escondido para detectar visualização da última foto
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📸 Vi todas as fotos!", key="saw_all_photos", use_container_width=True):
-            st.session_state.last_photo_seen = True
-            st.rerun()
+    # JavaScript para verificar localStorage e ativar botão
+    check_progress_js = """
+    <script>
+        if (localStorage.getItem('lastPhotoReached') === 'true') {
+            // Enviar sinal para Streamlit
+            window.parent.postMessage({type: 'progressComplete'}, '*');
+        }
+    </script>
+    """
+    st.markdown(check_progress_js, unsafe_allow_html=True)
     
-    # Mostrar botão apenas se viu todas as fotos
-    if st.session_state.last_photo_seen:
+    # Botão para ativar o modo "progress complete"
+    if st.button("🔄", key="check_progress", help="Verificar progresso"):
+        st.session_state.progress_complete = True
+        st.rerun()
+    
+    # Mostrar botão apenas se progresso completou
+    if st.session_state.progress_complete:
         # Contador de cliques
         st.markdown(f"""
         <div style="

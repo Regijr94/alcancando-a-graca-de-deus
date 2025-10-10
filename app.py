@@ -347,7 +347,7 @@ def show_intro_page():
             
             #typed-text {{
                 font-family: 'Great Vibes', cursive;
-                font-size: 72px;
+                font-size: 56px;
                 line-height: 1.5;
                 min-height: 350px;
                 text-shadow: 
@@ -384,7 +384,7 @@ def show_intro_page():
                 align-items: center;
             }}
             #infinity {{
-                font-size: 220px;
+                font-size: 180px;
                 animation: pulse 1.5s infinite;
                 color: #fff;
                 text-shadow: 
@@ -398,7 +398,7 @@ def show_intro_page():
             }}
             #infinity-text {{
                 font-family: 'Great Vibes', cursive;
-                font-size: 56px;
+                font-size: 44px;
                 color: #fff;
                 text-shadow: 
                     3px 3px 6px rgba(0,0,0,0.5),
@@ -780,7 +780,7 @@ def show_intro_page():
             
             #infinity-text {
                 font-family: 'Great Vibes', cursive;
-                font-size: 56px;
+                font-size: 52px;
                 color: #fff;
                 text-shadow: 
                     3px 3px 6px rgba(0,0,0,0.5),
@@ -978,9 +978,9 @@ def show_quiz_page():
         },
         {
             'num': 5,
-            'question': 'Quantas vezes terminamos o namoro?',
-            'options': ['0', '5', '3', '6', '2'],
-            'correct': 1,
+            'question': 'Qual local mais gostamos de sair ?',
+            'options': ['Praia', 'Shopping', 'Comer', 'Academia', 'Cinema'],
+            'correct': 2,
             'key': 'q5'
         },
         {
@@ -1497,7 +1497,7 @@ def show_gallery_page():
             print(f"Erro ao carregar música: {e}")
     
     # Criar carrossel com HTML/JS
-    slide_duration = 2  # segundos
+    slide_duration = 6  # segundos
     
     carousel_html = f"""
     <!DOCTYPE html>

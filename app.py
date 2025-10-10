@@ -31,6 +31,53 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Player de música global - toca em todas as páginas
+def add_global_music():
+    """Adiciona player de música que funciona em todas as páginas"""
+    if 'music_initialized' not in st.session_state:
+        music_dir = "music"
+        music_files = get_music_files(music_dir)
+        
+        if music_files:
+            try:
+                # Carregar todas as músicas
+                music_playlist = []
+                for music_file in music_files:
+                    with open(music_file, "rb") as audio_file:
+                        audio_bytes = audio_file.read()
+                        music_base64 = base64.b64encode(audio_bytes).decode()
+                        music_playlist.append(music_base64)
+                
+                if music_playlist:
+                    # HTML com player que toca todas as músicas em sequência
+                    music_html = f"""
+                    <div id="global-music-player" style="position: fixed; top: -1000px; left: -1000px; opacity: 0; pointer-events: none;">
+                        <audio id="audio-player" autoplay loop>
+                            <source src="data:audio/mpeg;base64,{music_playlist[0]}" type="audio/mpeg">
+                        </audio>
+                        <script>
+                            const playlist = {[f'data:audio/mpeg;base64,{m}' for m in music_playlist]};
+                            let currentTrack = 0;
+                            const audioPlayer = document.getElementById('audio-player');
+                            
+                            audioPlayer.addEventListener('ended', function() {{
+                                currentTrack = (currentTrack + 1) % playlist.length;
+                                audioPlayer.src = playlist[currentTrack];
+                                audioPlayer.play();
+                            }});
+                            
+                            // Garantir que a música comece
+                            setTimeout(() => {{
+                                audioPlayer.play().catch(e => console.log('Autoplay bloqueado:', e));
+                            }}, 100);
+                        </script>
+                    </div>
+                    """
+                    st.markdown(music_html, unsafe_allow_html=True)
+                    st.session_state.music_initialized = True
+            except Exception as e:
+                print(f"Erro ao carregar música: {e}")
+
 def get_image_files(directory):
     """Obtém lista de arquivos de imagem do diretório"""
     image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
@@ -111,6 +158,9 @@ def image_to_base64(image_path, max_width=1920):
         return None
 
 def main():
+    # Adicionar música global que toca em todas as páginas
+    add_global_music()
+    
     # Verificar query params para mudança de página (compatível com versões antigas)
     try:
         # Tentar nova API primeiro
@@ -933,14 +983,6 @@ def show_intro_page():
     # Renderizar com components.html
     components.html(typing_html, height=700, scrolling=False)
     
-    # Player de música
-    if music_base64:
-        st.markdown(f'''
-        <audio autoplay loop style="display: none;">
-            <source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg">
-        </audio>
-        ''', unsafe_allow_html=True)
-    
     # Botão manual para avançar
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -1140,11 +1182,8 @@ def show_quiz_page():
         <h1 style="
             font-family: 'Great Vibes', cursive;
             font-size: 64px;
-            color: #fff;
-            text-shadow: 
-                3px 3px 6px rgba(0,0,0,0.4),
-                0 0 30px rgba(255, 182, 193, 0.8),
-                0 0 60px rgba(255, 105, 180, 0.6);
+            color: #000;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.6);
             margin-bottom: 10px;
         ">
             💕 Quiz do Nosso Amor 💕
@@ -1152,8 +1191,8 @@ def show_quiz_page():
         <p style="
             font-family: 'Dancing Script', cursive;
             font-size: 28px;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #000;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
         ">
             Pergunta {st.session_state.quiz_current_question + 1} de {total_questions}
         </p>
@@ -1175,8 +1214,8 @@ def show_quiz_page():
         <h3 style="
             font-family: 'Dancing Script', cursive;
             font-size: 42px;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #000;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
             margin-bottom: 30px;
             text-align: center;
             line-height: 1.5;
@@ -1198,8 +1237,8 @@ def show_quiz_page():
         div[data-testid="stRadio"] > label {
             font-family: 'Dancing Script', cursive !important;
             font-size: 28px !important;
-            color: white !important;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+            color: #000 !important;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5) !important;
             margin-bottom: 20px !important;
             text-align: center !important;
             display: block !important;
@@ -1232,8 +1271,8 @@ def show_quiz_page():
         div[data-testid="stRadio"] label[data-baseweb="radio"] span {
             font-family: 'Dancing Script', cursive !important;
             font-size: 24px !important;
-            color: white !important;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+            color: #000 !important;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5) !important;
         }
     </style>
     """, unsafe_allow_html=True)

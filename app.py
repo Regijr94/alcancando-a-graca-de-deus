@@ -2425,7 +2425,7 @@ def show_gallery_page():
         </div>
         """, unsafe_allow_html=True)
         
-        # Botão em posição aleatória
+        # Botão em posição aleatória com JavaScript para clicar no botão Streamlit
         button_html = f"""
         <style>
             #random-button {{
@@ -2458,30 +2458,49 @@ def show_gallery_page():
             }}
         </style>
         
-        <button id="random-button">
+        <button id="random-button" onclick="clickStreamlitButton()">
             Clique Aqui
         </button>
+        
+        <script>
+            function clickStreamlitButton() {{
+                // Encontrar e clicar no botão Streamlit oculto
+                const streamlitBtn = window.parent.document.querySelector('button[key="secret_click_btn"]') ||
+                                   window.parent.document.querySelector('button[data-testid*="secret"]') ||
+                                   Array.from(window.parent.document.querySelectorAll('button')).find(btn => btn.textContent.includes('🎯'));
+                
+                if (streamlitBtn) {{
+                    streamlitBtn.click();
+                }} else {{
+                    // Fallback: trigger pelo ID se existir
+                    const fallbackBtn = document.getElementById('secret-click-fallback');
+                    if (fallbackBtn) fallbackBtn.click();
+                }}
+            }}
+        </script>
         """
         
         st.markdown(button_html, unsafe_allow_html=True)
         
-        # Botão Streamlit para capturar cliques
-        if st.button("🎯", key="secret_click_btn"):
-            st.session_state.click_count += 1
-            
-            # Na 3ª vez (após 2 cliques), vai para o pedido
-            if st.session_state.click_count >= 2:
-                st.session_state.page = 'proposal'
-                st.session_state.click_count = 0  # Reset
-                st.session_state.last_photo_seen = False  # Reset
-                st.rerun()
-            else:
-                # Mudar posição do botão aleatoriamente
-                st.session_state.button_position = {
-                    'top': random.randint(15, 75), 
-                    'left': random.randint(15, 75)
-                }
-                st.rerun()
+        # Botão Streamlit OCULTO para capturar cliques
+        col1, col2, col3 = st.columns([10, 1, 10])
+        with col2:
+            if st.button("🎯", key="secret_click_btn", help="Clique no botão rosa!"):
+                st.session_state.click_count += 1
+                
+                # Na 3ª vez (após 2 cliques), vai para o pedido
+                if st.session_state.click_count >= 2:
+                    st.session_state.page = 'proposal'
+                    st.session_state.click_count = 0  # Reset
+                    st.session_state.progress_complete = False  # Reset
+                    st.rerun()
+                else:
+                    # Mudar posição do botão aleatoriamente
+                    st.session_state.button_position = {
+                        'top': random.randint(15, 75), 
+                        'left': random.randint(15, 75)
+                    }
+                    st.rerun()
 
 if __name__ == "__main__":
     main()

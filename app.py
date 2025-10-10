@@ -1534,10 +1534,7 @@ def show_proposal_page():
         </script>
         ''', unsafe_allow_html=True)
     
-    # Inserir foto 37 no HTML
-    photo_37_data = background_image if background_image else ""
-    
-    proposal_html = f"""
+    proposal_html = """
     <!DOCTYPE html>
     <html>
     <head>
@@ -1572,9 +1569,9 @@ def show_proposal_page():
             }
             
             @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
+                0%% { background-position: 0%% 50%%; }
+                50%% { background-position: 100%% 50%%; }
+                100%% { background-position: 0%% 50%%; }
             }
             
             /* Corações flutuantes */
@@ -1599,13 +1596,13 @@ def show_proposal_page():
             .heart:nth-child(10) { left: 15%; animation-delay: 6s; }
             
             @keyframes floatHearts {
-                0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
-                10% { opacity: 0.8; }
-                90% { opacity: 0.8; }
-                100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+                0%% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+                10%% { opacity: 0.8; }
+                90%% { opacity: 0.8; }
+                100%% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
             }
             
-            #proposal-container {{
+            #proposal-container {
                 text-align: center;
                 color: white;
                 padding: 60px;
@@ -1613,8 +1610,8 @@ def show_proposal_page():
                 position: relative;
                 z-index: 10;
                 background: 
-                    linear-gradient(rgba(255, 154, 158, 0.7), rgba(252, 182, 159, 0.7)),
-                    url('{photo_37_data}');
+                    linear-gradient(rgba(255, 105, 180, 0.75), rgba(255, 182, 193, 0.75)),
+                    url('""" + (background_image if background_image else '') + """');
                 background-size: cover;
                 background-position: center;
                 backdrop-filter: blur(8px);
@@ -1625,7 +1622,7 @@ def show_proposal_page():
                     inset 0 0 30px rgba(255, 255, 255, 0.1);
                 opacity: 0;
                 animation: fadeInProposal 2s forwards;
-            }}
+            }
             
             @keyframes fadeInProposal {
                 from {
@@ -1652,8 +1649,8 @@ def show_proposal_page():
             }
             
             @keyframes textGlow {
-                0%, 100% { text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 0 0 40px rgba(255, 182, 193, 0.8); }
-                50% { text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 0 0 60px rgba(255, 105, 180, 1); }
+                0%%, 100%% { text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 0 0 40px rgba(255, 182, 193, 0.8); }
+                50%% { text-shadow: 3px 3px 8px rgba(0,0,0,0.5), 0 0 60px rgba(255, 105, 180, 1); }
             }
             
             #ring {
@@ -1664,9 +1661,9 @@ def show_proposal_page():
             }
             
             @keyframes ringBounce {
-                0%, 100% { transform: translateY(0) rotate(0deg); }
-                25% { transform: translateY(-20px) rotate(-10deg); }
-                75% { transform: translateY(-10px) rotate(10deg); }
+                0%%, 100%% { transform: translateY(0) rotate(0deg); }
+                25%% { transform: translateY(-20px) rotate(-10deg); }
+                75%% { transform: translateY(-10px) rotate(10deg); }
             }
             
             #question {
@@ -1682,8 +1679,8 @@ def show_proposal_page():
             }
             
             @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.1); }
+                0%%, 100%% { transform: scale(1); }
+                50%% { transform: scale(1.1); }
             }
             
             .sparkle {
@@ -1697,8 +1694,8 @@ def show_proposal_page():
             }
             
             @keyframes sparkleAnim {
-                0%, 100% { opacity: 0; transform: scale(0); }
-                50% { opacity: 1; transform: scale(1); }
+                0%%, 100%% { opacity: 0; transform: scale(0); }
+                50%% { opacity: 1; transform: scale(1); }
             }
             
             /* Responvidade */
@@ -1858,27 +1855,27 @@ def show_proposal_page():
             
             <style>
                 @keyframes celebrationPop {
-                    0% { 
+                    0%% { 
                         transform: translate(-50%, -50%) scale(0.3); 
                         opacity: 0; 
                     }
-                    50% { 
+                    50%% { 
                         transform: translate(-50%, -50%) scale(1.1); 
                     }
-                    100% { 
+                    100%% { 
                         transform: translate(-50%, -50%) scale(1); 
                         opacity: 1; 
                     }
                 }
                 
                 @keyframes textBounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-10px); }
+                    0%%, 100%% { transform: translateY(0); }
+                    50%% { transform: translateY(-10px); }
                 }
                 
                 @keyframes emojiSpin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
+                    0%% { transform: rotate(0deg); }
+                    100%% { transform: rotate(360deg); }
                 }
             </style>
             """
@@ -2462,7 +2459,7 @@ def show_gallery_page():
         </style>
         
         <button id="random-button">
-            💍 Clique Aqui 💍
+            Clique Aqui
         </button>
         """
         

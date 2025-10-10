@@ -1069,14 +1069,6 @@ def show_intro_page():
     # Renderizar com components.html
     components.html(typing_html, height=700, scrolling=False)
     
-    # Botão manual para avançar
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("💕 Continuar para a Galeria 💕", key="continue_btn", use_container_width=True):
-            st.session_state.page = 'gallery'
-            st.rerun()
-    
     # Auto-avançar após tempo suficiente para todas as animações
     # Digitação (~8s) + pausa (2s) + fade out (1s) + infinito (8s) = ~19s
     import time

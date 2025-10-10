@@ -92,6 +92,25 @@ def get_image_files(directory):
     
     return image_files
 
+def get_media_files(directory):
+    """Obtém lista de arquivos de mídia (imagens e vídeos) do diretório"""
+    media_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.mp4', '.avi', '.mov', '.mkv', '.webm'}
+    media_files = []
+    
+    if os.path.exists(directory):
+        for file in sorted(os.listdir(directory)):
+            if Path(file).suffix.lower() in media_extensions:
+                full_path = os.path.join(directory, file)
+                if not file.endswith(':Zone.Identifier'):  # Ignorar arquivos do Windows
+                    media_files.append(full_path)
+    
+    return media_files
+
+def is_video_file(file_path):
+    """Verifica se o arquivo é um vídeo"""
+    video_extensions = {'.mp4', '.avi', '.mov', '.mkv', '.webm'}
+    return Path(file_path).suffix.lower() in video_extensions
+
 def get_music_files(directory):
     """Obtém lista de arquivos de música do diretório"""
     music_extensions = {'.mp3', '.wav', '.ogg', '.m4a'}
@@ -620,15 +639,16 @@ def show_intro_page():
         """ + (f'<audio id="intro-music" autoplay loop style="display: none;"><source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg"></audio>' if music_base64 else '') + """
         
         <script>
-            const text = "Meu amor, agora construí minha própria aplicação para te dizer o quanto te amo, e sou feliz por ter você.";
+            const text1 = "Meu amor, agora construí minha própria aplicação";
+            const text2 = "Só para te dizer o quanto te amo, e sou feliz por ter você";
             const typedTextElement = document.getElementById('typed-text');
             const infinityContainer = document.getElementById('infinity-container');
             let index = 0;
             
             async function typeText() {
-                // Digitar texto letra por letra
-                while (index < text.length) {
-                    typedTextElement.textContent = text.substring(0, index + 1);
+                // PRIMEIRA FRASE: Digitar letra por letra
+                while (index < text1.length) {
+                    typedTextElement.textContent = text1.substring(0, index + 1);
                     
                     // Adicionar cursor piscando
                     const cursor = document.createElement('span');
@@ -642,8 +662,41 @@ def show_intro_page():
                     await new Promise(resolve => setTimeout(resolve, 80));
                 }
                 
-                // Remover cursor
-                const cursor = typedTextElement.querySelector('.cursor');
+                // Remover cursor da primeira frase
+                let cursor = typedTextElement.querySelector('.cursor');
+                if (cursor) cursor.remove();
+                
+                // Aguardar 1.5 segundos antes de trocar
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Fade out da primeira frase
+                typedTextElement.style.animation = 'fadeOut 0.8s forwards';
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Reset para segunda frase
+                typedTextElement.style.animation = 'none';
+                typedTextElement.style.opacity = '1';
+                typedTextElement.textContent = '';
+                index = 0;
+                
+                // SEGUNDA FRASE: Digitar letra por letra
+                while (index < text2.length) {
+                    typedTextElement.textContent = text2.substring(0, index + 1);
+                    
+                    // Adicionar cursor piscando
+                    const cursor = document.createElement('span');
+                    cursor.className = 'cursor';
+                    cursor.innerHTML = '&nbsp;';
+                    typedTextElement.appendChild(cursor);
+                    
+                    index++;
+                    
+                    // Velocidade de digitação (em ms)
+                    await new Promise(resolve => setTimeout(resolve, 80));
+                }
+                
+                // Remover cursor da segunda frase
+                cursor = typedTextElement.querySelector('.cursor');
                 if (cursor) cursor.remove();
                 
                 // Aguardar 2 segundos para ler o texto
@@ -937,14 +990,18 @@ def show_intro_page():
         </div>
         
         <script>
-            const text = "Meu amor, agora construí minha própria aplicação para te dizer o quanto te amo, e sou feliz por ter você.";
+            const text1 = "Meu amor, agora construí minha própria aplicação";
+            const text2 = "Só para te dizer o quanto te amo, e sou feliz por ter você";
             const typedTextElement = document.getElementById('typed-text');
             const infinityContainer = document.getElementById('infinity-container');
             let index = 0;
+            let currentPhase = 1; // Fase 1: primeira frase, Fase 2: segunda frase
             
             function typeText() {
-                if (index < text.length) {
-                    typedTextElement.textContent = text.substring(0, index + 1);
+                const currentText = currentPhase === 1 ? text1 : text2;
+                
+                if (index < currentText.length) {
+                    typedTextElement.textContent = currentText.substring(0, index + 1);
                     
                     // Adicionar cursor piscando
                     const cursor = document.createElement('span');
@@ -958,22 +1015,44 @@ def show_intro_page():
                     const cursor = typedTextElement.querySelector('.cursor');
                     if (cursor) cursor.remove();
                     
-                    // Aguardar 2 segundos
-                    setTimeout(() => {
-                        // Fade out do texto
-                        typedTextElement.style.animation = 'fadeOut 1s forwards';
-                        
+                    if (currentPhase === 1) {
+                        // Primeira frase completa, aguardar 1.5s e iniciar segunda frase
                         setTimeout(() => {
-                            // Esconder texto e mostrar infinito
-                            typedTextElement.style.display = 'none';
-                            infinityContainer.style.display = 'block';
-                            infinityContainer.style.animation = 'fadeIn 1.5s forwards';
-                        }, 1000);
-                    }, 2000);
+                            // Fade out da primeira frase
+                            typedTextElement.style.animation = 'fadeOut 0.8s forwards';
+                            
+                            setTimeout(() => {
+                                // Reset para segunda frase
+                                typedTextElement.style.animation = 'none';
+                                typedTextElement.style.opacity = '1';
+                                typedTextElement.textContent = '';
+                                index = 0;
+                                currentPhase = 2;
+                                
+                                // Fade in e começar segunda frase
+                                setTimeout(() => {
+                                    typeText();
+                                }, 100);
+                            }, 800);
+                        }, 1500);
+                    } else {
+                        // Segunda frase completa, aguardar e mostrar infinito
+                        setTimeout(() => {
+                            // Fade out da segunda frase
+                            typedTextElement.style.animation = 'fadeOut 1s forwards';
+                            
+                            setTimeout(() => {
+                                // Esconder texto e mostrar infinito
+                                typedTextElement.style.display = 'none';
+                                infinityContainer.style.display = 'block';
+                                infinityContainer.style.animation = 'fadeIn 1.5s forwards';
+                            }, 1000);
+                        }, 2000);
+                    }
                 }
             }
             
-            // Iniciar digitação
+            // Iniciar digitação da primeira frase
             typeText();
         </script>
     </body>
@@ -1388,13 +1467,17 @@ def show_gallery_page():
     pictures_dir = "pictures"
     music_dir = "music"
     
-    # Obter arquivos
-    image_files = get_image_files(pictures_dir)
+    # Obter arquivos (imagens e vídeos)
+    media_files = get_media_files(pictures_dir)
     music_files = get_music_files(music_dir)
     
-    if not image_files:
-        st.error("❌ Nenhuma foto encontrada no diretório 'pictures'!")
+    if not media_files:
+        st.error("❌ Nenhuma foto ou vídeo encontrado no diretório 'pictures'!")
         return
+    
+    # Separar imagens e vídeos
+    image_files = [f for f in media_files if not is_video_file(f)]
+    video_files = [f for f in media_files if is_video_file(f)]
     
     # Título
     st.markdown("""
@@ -1556,13 +1639,40 @@ def show_gallery_page():
         "Para sempre ao teu lado, meu amor"
     ]
     
-    # Converter imagens para base64 (limitando para não sobrecarregar)
-    st.info(f"📸 Carregando {len(image_files)} fotos...")
-    images_base64 = []
-    for img_path in image_files[:50]:  # Limitar a 50 fotos
-        img_b64 = image_to_base64(img_path)
-        if img_b64:
-            images_base64.append(img_b64)
+    # Converter mídias para base64 (limitando para não sobrecarregar)
+    total_media = len(media_files)
+    st.info(f"📸 Carregando {len(image_files)} fotos e {len(video_files)} vídeos...")
+    
+    # Criar lista de mídias com tipo e conteúdo base64
+    media_list = []
+    for media_path in media_files[:50]:  # Limitar a 50 arquivos
+        try:
+            if is_video_file(media_path):
+                # Processar vídeo
+                with open(media_path, "rb") as video_file:
+                    video_bytes = video_file.read()
+                    video_base64 = base64.b64encode(video_bytes).decode()
+                    video_ext = Path(media_path).suffix.lower()
+                    mime_type = 'video/mp4' if video_ext == '.mp4' else f'video/{video_ext[1:]}'
+                    media_list.append({
+                        'type': 'video',
+                        'data': f"data:{mime_type};base64,{video_base64}",
+                        'mime': mime_type
+                    })
+            else:
+                # Processar imagem
+                img_b64 = image_to_base64(media_path)
+                if img_b64:
+                    media_list.append({
+                        'type': 'image',
+                        'data': img_b64,
+                        'mime': 'image/jpeg'
+                    })
+        except Exception as e:
+            print(f"Erro ao processar {media_path}: {e}")
+    
+    # Manter compatibilidade (para legendas)
+    images_base64 = [m['data'] for m in media_list]
     
     # Música em base64
     music_base64 = None
@@ -1594,7 +1704,7 @@ def show_gallery_page():
                 height: 80vh;
                 overflow: hidden;
             }}
-            .carousel-image {{
+            .carousel-image, .carousel-video {{
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -1604,7 +1714,7 @@ def show_gallery_page():
                 opacity: 0;
                 transition: opacity 1s ease-in-out;
             }}
-            .carousel-image.active {{
+            .carousel-image.active, .carousel-video.active {{
                 opacity: 1;
             }}
             #controls {{
@@ -1666,29 +1776,49 @@ def show_gallery_page():
     </head>
     <body>
         <div id="carousel-container">
-            {''.join([f'<img class="carousel-image" id="img-{i}" src="{img}" />' for i, img in enumerate(images_base64)])}
+            {''.join([
+                f'<video class="carousel-video" id="media-{i}" controls muted loop><source src="{m["data"]}" type="{m["mime"]}"></video>' 
+                if m['type'] == 'video' 
+                else f'<img class="carousel-image" id="media-{i}" src="{m["data"]}" />'
+                for i, m in enumerate(media_list)
+            ])}
         </div>
         
         <div id="info">
             <div id="verse">{poesia_versos[0] if poesia_versos else ""}</div>
-            <div id="counter">1 / {len(images_base64)}</div>
+            <div id="counter">1 / {len(media_list)}</div>
         </div>
         <div id="controls">
-            {''.join([f'<div class="dot" onclick="goTo({i})"></div>' for i in range(len(images_base64))])}
+            {''.join([f'<div class="dot" onclick="goTo({i})"></div>' for i in range(len(media_list))])}
         </div>
         
         {f'<audio id="music-player" autoplay loop><source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg"></audio>' if music_base64 else ''}
         
         <script>
             let current = 0;
-            let total = {len(images_base64)};
+            let total = {len(media_list)};
             const verses = {poesia_versos};
             
             function show(index) {{
-                document.querySelectorAll('.carousel-image').forEach(img => img.classList.remove('active'));
+                // Pausar todos os vídeos e remover classe active
+                document.querySelectorAll('.carousel-image, .carousel-video').forEach(media => {{
+                    media.classList.remove('active');
+                    if (media.tagName === 'VIDEO') {{
+                        media.pause();
+                        media.currentTime = 0;
+                    }}
+                }});
                 document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
                 
-                document.getElementById('img-' + index).classList.add('active');
+                // Ativar mídia atual
+                const currentMedia = document.getElementById('media-' + index);
+                currentMedia.classList.add('active');
+                
+                // Se for vídeo, tocar
+                if (currentMedia.tagName === 'VIDEO') {{
+                    currentMedia.play();
+                }}
+                
                 document.querySelectorAll('.dot')[index].classList.add('active');
                 document.getElementById('counter').textContent = (index + 1) + ' / ' + total;
                 

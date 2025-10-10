@@ -2192,12 +2192,12 @@ def show_gallery_page():
             }}
             #progress-container {{
                 position: fixed;
-                top: 0;
+                bottom: 0;
                 left: 0;
                 width: 100%;
                 z-index: 200;
-                background: rgba(0, 0, 0, 0.8);
-                padding: 20px;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 15px 20px;
             }}
             #progress-bar {{
                 width: 100%;
@@ -2362,26 +2362,43 @@ def show_gallery_page():
     if 'button_position' not in st.session_state:
         st.session_state.button_position = {'top': random.randint(15, 75), 'left': random.randint(15, 75)}
     
-    # Botão aparece apenas após barra chegar em 100%
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    
-    # JavaScript para verificar localStorage e ativar botão
-    check_progress_js = """
+    # Verificar se chegou em 100% via query params ou botão escondido
+    # Adicionar um pequeno script para detectar quando chegar em 100%
+    check_script = """
     <script>
-        if (localStorage.getItem('lastPhotoReached') === 'true') {
-            // Enviar sinal para Streamlit
-            window.parent.postMessage({type: 'progressComplete'}, '*');
-        }
+        // Verificar localStorage periodicamente
+        setInterval(() => {
+            if (localStorage.getItem('lastPhotoReached') === 'true') {
+                // Forçar reload para mostrar botão
+                if (!window.location.search.includes('progress=100')) {
+                    window.location.search = '?progress=100';
+                }
+            }
+        }, 1000);
     </script>
     """
-    st.markdown(check_progress_js, unsafe_allow_html=True)
+    st.markdown(check_script, unsafe_allow_html=True)
     
-    # Botão para ativar o modo "progress complete"
-    if st.button("🔄", key="check_progress", help="Verificar progresso"):
-        st.session_state.progress_complete = True
-        st.rerun()
+    # Verificar se chegou em 100% via URL
+    try:
+        if 'progress' in st.query_params and st.query_params['progress'] == '100':
+            st.session_state.progress_complete = True
+    except:
+        pass
     
-    # Mostrar botão apenas se progresso completou
+    # Adicionar espaço
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
+    
+    # Botão escondido para ativar quando chegar em 100%
+    if not st.session_state.progress_complete:
+        # Mostrar um botão bem pequeno e discreto para debug
+        col1, col2, col3 = st.columns([5, 1, 5])
+        with col2:
+            if st.button("✓", key="check_progress_hidden", help="Progresso completo"):
+                st.session_state.progress_complete = True
+                st.rerun()
+    
+    # Mostrar botão APENAS se progresso completou (100%)
     if st.session_state.progress_complete:
         # Contador de cliques
         st.markdown(f"""

@@ -347,7 +347,7 @@ def show_intro_page():
             
             #typed-text {{
                 font-family: 'Great Vibes', cursive;
-                font-size: 56px;
+                font-size: 38px;
                 line-height: 1.5;
                 min-height: 350px;
                 text-shadow: 
@@ -384,7 +384,7 @@ def show_intro_page():
                 align-items: center;
             }}
             #infinity {{
-                font-size: 180px;
+                font-size: 120px;
                 animation: pulse 1.5s infinite;
                 color: #fff;
                 text-shadow: 
@@ -398,7 +398,7 @@ def show_intro_page():
             }}
             #infinity-text {{
                 font-family: 'Great Vibes', cursive;
-                font-size: 44px;
+                font-size: 32px;
                 color: #fff;
                 text-shadow: 
                     3px 3px 6px rgba(0,0,0,0.5),
@@ -455,6 +455,45 @@ def show_intro_page():
                 from {{ opacity: 0; }}
                 to {{ opacity: 1; }}
             }}
+            
+            /* Otimização para celular e tablets */
+            @media (max-width: 768px) {{
+                #typed-text {{
+                    font-size: 28px;
+                    min-height: 250px;
+                    padding: 20px;
+                }}
+                #infinity {{
+                    font-size: 80px;
+                }}
+                #infinity-text {{
+                    font-size: 24px;
+                    padding: 0 15px;
+                }}
+                .intro-container {{
+                    padding: 20px;
+                    max-width: 95%;
+                }}
+            }}
+            
+            @media (max-width: 480px) {{
+                #typed-text {{
+                    font-size: 22px;
+                    min-height: 200px;
+                    padding: 15px;
+                }}
+                #infinity {{
+                    font-size: 60px;
+                }}
+                #infinity-text {{
+                    font-size: 20px;
+                    padding: 0 10px;
+                }}
+                .intro-container {{
+                    padding: 15px;
+                }}
+            }}
+            
             @keyframes fadeOut {{
                 from {{ opacity: 1; }}
                 to {{ opacity: 0; }}

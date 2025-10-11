@@ -288,6 +288,72 @@ def main():
     # Adicionar música global que toca em todas as páginas
     add_global_music()
     
+    # Botão flutuante de controle de música
+    st.markdown("""
+    <style>
+        #music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #music-control:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        
+        #music-control-icon {
+            font-size: 24px;
+        }
+    </style>
+    
+    <div id="music-control" onclick="toggleMusic()">
+        <span id="music-control-icon">🎵</span>
+    </div>
+    
+    <script>
+        function toggleMusic() {
+            const audioPlayer = document.getElementById('global-music-player');
+            const icon = document.getElementById('music-control-icon');
+            
+            if (audioPlayer) {
+                if (audioPlayer.paused) {
+                    audioPlayer.play().then(() => {
+                        icon.textContent = '🎵';
+                        localStorage.setItem('music_is_playing', 'true');
+                    });
+                } else {
+                    audioPlayer.pause();
+                    icon.textContent = '🔇';
+                    localStorage.setItem('music_is_playing', 'false');
+                }
+            }
+        }
+        
+        // Atualizar ícone baseado no estado atual
+        setInterval(() => {
+            const audioPlayer = document.getElementById('global-music-player');
+            const icon = document.getElementById('music-control-icon');
+            if (audioPlayer && icon) {
+                icon.textContent = audioPlayer.paused ? '🔇' : '🎵';
+            }
+        }, 500);
+    </script>
+    """, unsafe_allow_html=True)
+    
     # Verificar query params para mudança de página (compatível com versões antigas)
     try:
         # Tentar nova API primeiro
@@ -1338,7 +1404,41 @@ def show_intro_page():
             
             // Iniciar digitação da primeira frase
             typeText();
+            
+            // Botão "Pular" que aparece após 5 segundos
+            setTimeout(() => {{
+                const skipButton = document.getElementById('skip-button');
+                if (skipButton) {{
+                    skipButton.style.opacity = '1';
+                    skipButton.style.pointerEvents = 'auto';
+                }}
+            }}, 5000);
         </script>
+        
+        <!-- Botão Pular -->
+        <a id="skip-button" href="?page=gallery" style="
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            z-index: 1000;
+        " onmouseover="this.style.background='rgba(255, 255, 255, 0.4)'; this.style.transform='scale(1.05)';" 
+           onmouseout="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='scale(1)';">
+            Pular ⏭️
+        </a>
     </body>
     </html>
     """

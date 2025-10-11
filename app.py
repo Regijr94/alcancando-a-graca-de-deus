@@ -51,25 +51,85 @@ def add_global_music():
                 if music_playlist:
                     # HTML com player que toca todas as músicas em sequência
                     music_html = f"""
-                    <div id="global-music-player" style="position: fixed; top: -1000px; left: -1000px; opacity: 0; pointer-events: none;">
-                        <audio id="audio-player" autoplay loop>
+                    <div id="global-music-player" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
+                        <audio id="audio-player" autoplay loop style="display: none;">
                             <source src="data:audio/mpeg;base64,{music_playlist[0]}" type="audio/mpeg">
                         </audio>
+                        
+                        <!-- Botão de controle de música -->
+                        <button id="music-toggle-btn" style="
+                            background: linear-gradient(135deg, #ff6b9d, #c06c84);
+                            border: 2px solid white;
+                            border-radius: 50%;
+                            width: 50px;
+                            height: 50px;
+                            font-size: 24px;
+                            cursor: pointer;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                            transition: all 0.3s ease;
+                        ">
+                            🎵
+                        </button>
+                        
                         <script>
                             const playlist = {[f'data:audio/mpeg;base64,{m}' for m in music_playlist]};
                             let currentTrack = 0;
                             const audioPlayer = document.getElementById('audio-player');
+                            const toggleBtn = document.getElementById('music-toggle-btn');
+                            let isPlaying = false;
                             
+                            // Trocar de música automaticamente
                             audioPlayer.addEventListener('ended', function() {{
                                 currentTrack = (currentTrack + 1) % playlist.length;
                                 audioPlayer.src = playlist[currentTrack];
                                 audioPlayer.play();
                             }});
                             
-                            // Garantir que a música comece
+                            // Botão de play/pause
+                            toggleBtn.addEventListener('click', function() {{
+                                if (isPlaying) {{
+                                    audioPlayer.pause();
+                                    toggleBtn.textContent = '🎵';
+                                    toggleBtn.style.background = 'linear-gradient(135deg, #999, #666)';
+                                }} else {{
+                                    audioPlayer.play();
+                                    toggleBtn.textContent = '🎶';
+                                    toggleBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c06c84)';
+                                }}
+                                isPlaying = !isPlaying;
+                            }});
+                            
+                            // Hover effect
+                            toggleBtn.addEventListener('mouseenter', function() {{
+                                this.style.transform = 'scale(1.1)';
+                            }});
+                            toggleBtn.addEventListener('mouseleave', function() {{
+                                this.style.transform = 'scale(1)';
+                            }});
+                            
+                            // Tentar tocar automaticamente após um delay
                             setTimeout(() => {{
-                                audioPlayer.play().catch(e => console.log('Autoplay bloqueado:', e));
-                            }}, 100);
+                                audioPlayer.play()
+                                    .then(() => {{
+                                        isPlaying = true;
+                                        toggleBtn.textContent = '🎶';
+                                        console.log('🎵 Música iniciada automaticamente!');
+                                    }})
+                                    .catch(e => {{
+                                        console.log('⚠️ Autoplay bloqueado. Clique no botão 🎵 para tocar.');
+                                        toggleBtn.style.animation = 'pulse 1s infinite';
+                                    }});
+                            }}, 500);
+                            
+                            // Animação de pulse para chamar atenção
+                            const style = document.createElement('style');
+                            style.textContent = `
+                                @keyframes pulse {{
+                                    0%, 100% {{ transform: scale(1); }}
+                                    50% {{ transform: scale(1.15); }}
+                                }}
+                            `;
+                            document.head.appendChild(style);
                         </script>
                     </div>
                     """
@@ -1849,7 +1909,7 @@ def show_proposal_page():
                     text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
                     margin: 20px 0;
                 ">
-                    AAHHH QUE FELICIDADE!<br>
+                    UUUUUUHUUUUUUUUULLLLLLLL QUE FELICIDADE!<br>
                     VAMOS CASAR! 💍💕✨
                 </p>
             </div>

@@ -1042,6 +1042,52 @@ def show_intro_page():
                 align-items: center;
                 justify-content: center;
                 text-align: center;
+                padding: 20px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            /* Responsividade para celular */
+            @media (max-width: 768px) {
+                #intro-container {
+                    padding: 30px 20px;
+                    max-width: 95%;
+                }
+                
+                #typed-text {
+                    font-size: 36px;
+                    min-height: 200px;
+                    padding: 15px;
+                }
+                
+                #infinity-symbol {
+                    font-size: 120px;
+                    margin: 30px 0 20px 0;
+                }
+                
+                #infinity-text {
+                    font-size: 28px;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                #intro-container {
+                    padding: 20px 15px;
+                }
+                
+                #typed-text {
+                    font-size: 28px;
+                    min-height: 180px;
+                    padding: 10px;
+                }
+                
+                #infinity-symbol {
+                    font-size: 100px;
+                }
+                
+                #infinity-text {
+                    font-size: 24px;
+                }
             }
             
             #infinity-container {
@@ -1502,9 +1548,9 @@ def show_quiz_page():
         
         div[data-testid="stRadio"] > label {
             font-family: 'Dancing Script', cursive !important;
-            font-size: 32px !important;
-            color: #2c3e50 !important;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8) !important;
+            font-size: 36px !important;
+            color: #000000 !important;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8) !important;
             margin-bottom: 25px !important;
             text-align: center !important;
             display: block !important;
@@ -1539,10 +1585,11 @@ def show_quiz_page():
         
         div[data-testid="stRadio"] label[data-baseweb="radio"] span {
             font-family: 'Dancing Script', cursive !important;
-            font-size: 26px !important;
+            font-size: 28px !important;
             color: #000000 !important;
             text-shadow: 0.5px 0.5px 2px rgba(255,255,255,0.8) !important;
             font-weight: bold !important;
+            line-height: 1.4 !important;
         }
         
         /* Responsivo para celular */
@@ -1555,6 +1602,20 @@ def show_quiz_page():
             div[data-testid="stRadio"] label[data-baseweb="radio"] span {
                 font-size: 22px !important;
             }
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # CSS adicional para label "Escolha sua resposta"
+    st.markdown("""
+    <style>
+        /* Label "Escolha sua resposta" com mesmo estilo da pergunta */
+        div[data-testid="stRadio"] > label > div > p {
+            font-family: 'Dancing Script', cursive !important;
+            font-size: 36px !important;
+            color: #000000 !important;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8) !important;
+            font-weight: bold !important;
         }
     </style>
     """, unsafe_allow_html=True)

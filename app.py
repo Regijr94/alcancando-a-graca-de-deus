@@ -1592,6 +1592,14 @@ def show_quiz_page():
             line-height: 1.4 !important;
         }
         
+        /* Forçar cor preta em todos os elementos de texto dentro do radio */
+        div[data-testid="stRadio"] label[data-baseweb="radio"] span,
+        div[data-testid="stRadio"] label[data-baseweb="radio"] div,
+        div[data-testid="stRadio"] label[data-baseweb="radio"] p,
+        div[data-testid="stRadio"] label[data-baseweb="radio"] * {
+            color: #000000 !important;
+        }
+        
         /* Responsivo para celular */
         @media (max-width: 768px) {
             div[data-testid="stRadio"] label[data-baseweb="radio"] {

@@ -1456,6 +1456,23 @@ def show_intro_page():
 def show_quiz_page():
     """Página do quiz romântico sobre o relacionamento"""
     
+    # Tentar restaurar progresso do localStorage (apenas se ainda não iniciou)
+    if 'quiz_progress_loaded' not in st.session_state:
+        st.session_state.quiz_progress_loaded = True
+        
+        # Adicionar JavaScript para carregar progresso
+        load_progress_html = """
+        <script>
+            const savedProgress = localStorage.getItem('quiz_progress');
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                console.log('Progresso encontrado:', progress);
+                // O progresso será carregado através do session_state do Streamlit
+            }
+        </script>
+        """
+        components.html(load_progress_html, height=0)
+    
     # Carregar fotos do diretório pictures para o mosaico
     pictures_dir = "pictures"
     image_files = get_image_files(pictures_dir)
@@ -1611,14 +1628,35 @@ def show_quiz_page():
     
     # Mostrar resultado final se terminado
     if st.session_state.quiz_show_result:
-        # Calcular acertos
+        # Calcular acertos e estatísticas
         correct_count = 0
+        wrong_questions = []
         for q in questions[:9]:  # Excluir pergunta 10
             if st.session_state.quiz_answers.get(q['key']) == q['correct']:
                 correct_count += 1
+            else:
+                wrong_questions.append(q['num'])
         
         total = 9
         percentage = (correct_count / total) * 100
+        wrong_count = total - correct_count
+        
+        # Mensagem personalizada baseada na performance
+        if percentage == 100:
+            performance_msg = "PERFEIÇÃO ABSOLUTA! 🏆<br>Você me conhece melhor<br>que eu mesma! 💖"
+            emoji = "🌟"
+        elif percentage >= 80:
+            performance_msg = "INCRÍVEL! 🎉<br>Você realmente presta<br>atenção em tudo! 💕"
+            emoji = "⭐"
+        elif percentage >= 60:
+            performance_msg = "MUITO BOM! 😊<br>Você me conhece<br>bastante! ❤️"
+            emoji = "💫"
+        elif percentage >= 40:
+            performance_msg = "BOM COMEÇO! 😅<br>Mas ainda tem<br>muito pra aprender! 💗"
+            emoji = "✨"
+        else:
+            performance_msg = "VAMOS ESTUDAR<br>MAIS BEBÊ! 📚<br>Ainda temos tempo! 💝"
+            emoji = "💕"
         
         st.markdown(f"""
         <div style="
@@ -1638,31 +1676,63 @@ def show_quiz_page():
                 text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
                 margin-bottom: 20px;
             ">
-                💖 Resultado Final 💖
+                {emoji} Resultado Final {emoji}
             </h2>
-            <p style="
-                font-family: 'Dancing Script', cursive;
-                font-size: 40px;
-                color: #fff;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                margin: 20px 0;
+            
+            <div style="
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin: 30px 0;
+                flex-wrap: wrap;
             ">
-                Você acertou {correct_count} de {total} perguntas!
-            </p>
-            <p style="
-                font-family: 'Dancing Script', cursive;
-                font-size: 36px;
-                color: #fff;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                margin: 20px 0;
-            ">
-                Nota: {percentage:.0f}%
-            </p>
+                <div style="
+                    background: rgba(255, 255, 255, 0.3);
+                    padding: 20px 40px;
+                    border-radius: 20px;
+                    backdrop-filter: blur(10px);
+                ">
+                    <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">✅ {correct_count}</p>
+                    <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Acertos</p>
+                </div>
+                
+                <div style="
+                    background: rgba(255, 255, 255, 0.3);
+                    padding: 20px 40px;
+                    border-radius: 20px;
+                    backdrop-filter: blur(10px);
+                ">
+                    <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">❌ {wrong_count}</p>
+                    <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Erros</p>
+                </div>
+                
+                <div style="
+                    background: rgba(255, 255, 255, 0.3);
+                    padding: 20px 40px;
+                    border-radius: 20px;
+                    backdrop-filter: blur(10px);
+                ">
+                    <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">📊 {percentage:.0f}%</p>
+                    <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Nota</p>
+                </div>
+            </div>
+            
             <p style="
                 font-family: 'Great Vibes', cursive;
-                font-size: 48px;
+                font-size: 44px;
                 color: #fff;
                 text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+                margin-top: 30px;
+                line-height: 1.5;
+            ">
+                {performance_msg}
+            </p>
+            
+            <p style="
+                font-family: 'Dancing Script', cursive;
+                font-size: 32px;
+                color: #fff;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
                 margin-top: 30px;
                 line-height: 1.4;
             ">
@@ -1952,10 +2022,29 @@ def show_quiz_page():
                 st.session_state.popup_message = "💖 A resposta é:<br>EU NA SUA VIDA, BEBÊ!!!! 💖"
                 st.session_state.popup_type = "special"
             elif answer == current_q['correct']:
-                st.session_state.popup_message = "✅ Ai sim bebê,<br>você é o amor da<br>minha vida ❤️"
+                # Mensagens variadas de acerto
+                success_messages = [
+                    "✅ Ai sim bebê,<br>você é o amor da<br>minha vida ❤️",
+                    "💕 Acertou meu amor!<br>Você me conhece<br>tão bem! 💕",
+                    "🌟 Isso aí bebê!<br>Você é demais! 🌟",
+                    "💖 Perfeito!<br>Meu coração é seu! 💖",
+                    "✨ Maravilhosa!<br>Como sempre! ✨",
+                    "❤️ Acertou meu bem!<br>Te amo demais! ❤️"
+                ]
+                import random
+                st.session_state.popup_message = random.choice(success_messages)
                 st.session_state.popup_type = "success"
             else:
-                st.session_state.popup_message = "❌ Ai não bebê!"
+                # Mensagem de erro com resposta correta
+                correct_answer = current_q['options'][current_q['correct']]
+                error_messages = [
+                    f"❌ Ops bebê!<br>A resposta certa é:<br><b>{correct_answer}</b>",
+                    f"💔 Errou meu amor!<br>Mas tudo bem...<br>Era: <b>{correct_answer}</b>",
+                    f"😅 Quase lá bebê!<br>A correta era:<br><b>{correct_answer}</b>",
+                    f"🤔 Não foi dessa vez!<br>A certa é:<br><b>{correct_answer}</b>"
+                ]
+                import random
+                st.session_state.popup_message = random.choice(error_messages)
                 st.session_state.popup_type = "error"
             
             # Mostrar popup
@@ -1975,6 +2064,28 @@ def show_quiz_page():
         else:
             st.session_state.quiz_show_result = True
             st.rerun()
+    
+    # Sistema de salvar progresso no localStorage
+    save_progress_html = f"""
+    <script>
+        // Salvar progresso do quiz no localStorage
+        const quizProgress = {{
+            currentQuestion: {st.session_state.quiz_current_question},
+            answers: {dict(st.session_state.quiz_answers)},
+            showResult: {'true' if st.session_state.quiz_show_result else 'false'}
+        }};
+        
+        localStorage.setItem('quiz_progress', JSON.stringify(quizProgress));
+        
+        // Adicionar botão de resetar progresso (escondido, apenas para desenvolvimento)
+        if (window.location.search.includes('reset_quiz=true')) {{
+            localStorage.removeItem('quiz_progress');
+            console.log('Progresso do quiz resetado!');
+        }}
+    </script>
+    """
+    
+    components.html(save_progress_html, height=0)
 
 def show_proposal_page():
     """Página do pedido de casamento"""
@@ -2297,7 +2408,7 @@ def show_proposal_page():
             st.balloons()
             st.snow()
             
-            # Mensagem de celebração com emojis
+            # Mensagem de celebração com emojis e efeitos especiais
             celebration_html = """
             <div style="
                 position: fixed;
@@ -2343,6 +2454,21 @@ def show_proposal_page():
                 </p>
             </div>
             
+            <!-- Confetes animados -->
+            <div class="confetti-container"></div>
+            
+            <!-- Corações flutuantes -->
+            <div class="hearts-container">
+                <div class="heart">❤️</div>
+                <div class="heart">💕</div>
+                <div class="heart">💖</div>
+                <div class="heart">💗</div>
+                <div class="heart">💘</div>
+                <div class="heart">💝</div>
+                <div class="heart">💞</div>
+                <div class="heart">💓</div>
+            </div>
+            
             <style>
                 @keyframes celebrationPop {
                     0%% { 
@@ -2367,7 +2493,85 @@ def show_proposal_page():
                     0%% { transform: rotate(0deg); }
                     100%% { transform: rotate(360deg); }
                 }
+                
+                @keyframes confettiFall {
+                    0%% {
+                        transform: translateY(-100vh) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100%% {
+                        transform: translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+                
+                @keyframes heartFloat {
+                    0%% {
+                        transform: translateY(100vh) scale(0);
+                        opacity: 0;
+                    }
+                    50%% {
+                        opacity: 1;
+                    }
+                    100%% {
+                        transform: translateY(-100vh) scale(1.5);
+                        opacity: 0;
+                    }
+                }
+                
+                .confetti-container {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%%;
+                    height: 100%%;
+                    pointer-events: none;
+                    z-index: 99998;
+                }
+                
+                .hearts-container {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%%;
+                    height: 100%%;
+                    pointer-events: none;
+                    z-index: 99997;
+                }
+                
+                .heart {
+                    position: absolute;
+                    font-size: 50px;
+                    animation: heartFloat 4s ease-in infinite;
+                }
+                
+                .heart:nth-child(1) { left: 10%%; animation-delay: 0s; }
+                .heart:nth-child(2) { left: 20%%; animation-delay: 0.5s; }
+                .heart:nth-child(3) { left: 30%%; animation-delay: 1s; }
+                .heart:nth-child(4) { left: 40%%; animation-delay: 1.5s; }
+                .heart:nth-child(5) { left: 60%%; animation-delay: 2s; }
+                .heart:nth-child(6) { left: 70%%; animation-delay: 2.5s; }
+                .heart:nth-child(7) { left: 80%%; animation-delay: 3s; }
+                .heart:nth-child(8) { left: 90%%; animation-delay: 3.5s; }
             </style>
+            
+            <script>
+                // Criar confetes
+                const confettiContainer = document.querySelector('.confetti-container');
+                const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#00d2d3'];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + '%%';
+                    confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear ${Math.random() * 2}s infinite`;
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%%' : '0';
+                    confettiContainer.appendChild(confetti);
+                }
+            </script>
             """
             
             st.markdown(celebration_html, unsafe_allow_html=True)
@@ -2720,6 +2924,55 @@ def show_gallery_page():
                 background: white;
                 transform: scale(1.3);
             }}
+            .nav-arrow {{
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(255,255,255,0.3);
+                color: white;
+                border: none;
+                font-size: 48px;
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+                backdrop-filter: blur(10px);
+            }}
+            .nav-arrow:hover {{
+                background: rgba(255,255,255,0.5);
+                transform: translateY(-50%) scale(1.1);
+            }}
+            .nav-arrow.left {{
+                left: 20px;
+            }}
+            .nav-arrow.right {{
+                right: 20px;
+            }}
+            #quiz-btn {{
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                font-size: 18px;
+                font-weight: bold;
+                border-radius: 30px;
+                cursor: pointer;
+                z-index: 100;
+                transition: all 0.3s;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }}
+            #quiz-btn:hover {{
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            }}
             #info {{
                 position: absolute;
                 bottom: 80px;
@@ -2735,6 +2988,25 @@ def show_gallery_page():
                 border: 2px solid rgba(255,255,255,0.3);
                 box-shadow: 0 8px 32px rgba(0,0,0,0.3);
                 max-width: 80%;
+            }}
+            @media (max-width: 768px) {{
+                .nav-arrow {{
+                    width: 50px;
+                    height: 50px;
+                    font-size: 32px;
+                }}
+                .nav-arrow.left {{
+                    left: 10px;
+                }}
+                .nav-arrow.right {{
+                    right: 10px;
+                }}
+                #quiz-btn {{
+                    top: 10px;
+                    right: 10px;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                }}
             }}
             #verse {{
                 font-size: 24px;
@@ -2773,6 +3045,10 @@ def show_gallery_page():
         <div id="controls">
             {''.join([f'<div class="dot" onclick="goTo({i})"></div>' for i in range(len(media_list))])}
         </div>
+        
+        <button class="nav-arrow left" onclick="prev()">‹</button>
+        <button class="nav-arrow right" onclick="next()">›</button>
+        <button id="quiz-btn" onclick="goToQuiz()">Ir para Quiz 🎯</button>
         
         {f'<audio id="music-player" autoplay loop><source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg"></audio>' if music_base64 else ''}
         
@@ -2831,15 +3107,53 @@ def show_gallery_page():
                 show((current + 1) % total);
             }}
             
+            function prev() {{
+                show((current - 1 + total) % total);
+            }}
+            
             function goTo(index) {{
                 show(index);
             }}
             
+            function goToQuiz() {{
+                window.location.href = '?page=quiz';
+            }}
+            
             // Controles de teclado
             document.addEventListener('keydown', (e) => {{
-                if (e.key === 'ArrowLeft') show((current - 1 + total) % total);
-                if (e.key === 'ArrowRight') show((current + 1) % total);
+                if (e.key === 'ArrowLeft') prev();
+                if (e.key === 'ArrowRight') next();
             }});
+            
+            // Suporte a swipe em dispositivos móveis
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            const container = document.getElementById('carousel-container');
+            
+            container.addEventListener('touchstart', (e) => {{
+                touchStartX = e.changedTouches[0].screenX;
+            }});
+            
+            container.addEventListener('touchend', (e) => {{
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }});
+            
+            function handleSwipe() {{
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+                
+                if (Math.abs(diff) > swipeThreshold) {{
+                    if (diff > 0) {{
+                        // Swipe left - próxima foto
+                        next();
+                    }} else {{
+                        // Swipe right - foto anterior
+                        prev();
+                    }}
+                }}
+            }}
             
             // Adicionar animação fadeIn
             const style = document.createElement('style');

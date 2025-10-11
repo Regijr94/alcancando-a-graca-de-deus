@@ -31,112 +31,120 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Player de música global - toca em todas as páginas
+# Player de música global - toca músicas específicas por página
 def add_global_music():
     """Adiciona player de música que funciona em todas as páginas"""
-    if 'music_initialized' not in st.session_state:
-        music_dir = "music"
-        music_files = get_music_files(music_dir)
-        
-        if music_files:
-            try:
-                # Carregar todas as músicas
-                music_playlist = []
-                for music_file in music_files:
+    # Detectar página atual
+    current_page = st.session_state.get('page', 'intro')
+    
+    # Selecionar música baseada na página
+    music_dir = "music"
+    music_files = get_music_files(music_dir)
+    
+    if music_files:
+        try:
+            # Separar músicas por nome
+            alceu_music = None
+            roberta_music = None
+            
+            for music_file in music_files:
+                if "Alceu" in music_file or "alceu" in music_file or "Belle" in music_file:
                     with open(music_file, "rb") as audio_file:
                         audio_bytes = audio_file.read()
-                        music_base64 = base64.b64encode(audio_bytes).decode()
-                        music_playlist.append(music_base64)
-                
-                if music_playlist:
-                    # HTML com player que toca todas as músicas em sequência
-                    music_html = f"""
-                    <div id="global-music-player" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
-                        <audio id="audio-player" autoplay loop style="display: none;">
-                            <source src="data:audio/mpeg;base64,{music_playlist[0]}" type="audio/mpeg">
-                        </audio>
+                        alceu_music = base64.b64encode(audio_bytes).decode()
+                elif "Roberta" in music_file or "roberta" in music_file or "Janeiro" in music_file:
+                    with open(music_file, "rb") as audio_file:
+                        audio_bytes = audio_file.read()
+                        roberta_music = base64.b64encode(audio_bytes).decode()
+            
+            # Escolher música baseada na página
+            if current_page == 'proposal':
+                selected_music = roberta_music if roberta_music else alceu_music
+                music_name = "Roberta Campos - De Janeiro a Janeiro"
+            else:  # intro, quiz, gallery
+                selected_music = alceu_music if alceu_music else roberta_music
+                music_name = "Alceu Valença - La Belle de Jour"
+            
+            if selected_music:
+                # HTML com player de música específica por página
+                music_html = f"""
+                <div id="global-music-player" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
+                    <audio id="audio-player" autoplay loop style="display: none;">
+                        <source src="data:audio/mpeg;base64,{selected_music}" type="audio/mpeg">
+                    </audio>
+                    
+                    <!-- Botão de controle de música -->
+                    <button id="music-toggle-btn" style="
+                        background: linear-gradient(135deg, #ff6b9d, #c06c84);
+                        border: 2px solid white;
+                        border-radius: 50%;
+                        width: 50px;
+                        height: 50px;
+                        font-size: 24px;
+                        cursor: pointer;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                        transition: all 0.3s ease;
+                        title: '{music_name}';
+                    ">
+                        🎵
+                    </button>
+                    
+                    <script>
+                        const audioPlayer = document.getElementById('audio-player');
+                        const toggleBtn = document.getElementById('music-toggle-btn');
+                        let isPlaying = false;
                         
-                        <!-- Botão de controle de música -->
-                        <button id="music-toggle-btn" style="
-                            background: linear-gradient(135deg, #ff6b9d, #c06c84);
-                            border: 2px solid white;
-                            border-radius: 50%;
-                            width: 50px;
-                            height: 50px;
-                            font-size: 24px;
-                            cursor: pointer;
-                            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                            transition: all 0.3s ease;
-                        ">
-                            🎵
-                        </button>
-                        
-                        <script>
-                            const playlist = {[f'data:audio/mpeg;base64,{m}' for m in music_playlist]};
-                            let currentTrack = 0;
-                            const audioPlayer = document.getElementById('audio-player');
-                            const toggleBtn = document.getElementById('music-toggle-btn');
-                            let isPlaying = false;
-                            
-                            // Trocar de música automaticamente
-                            audioPlayer.addEventListener('ended', function() {{
-                                currentTrack = (currentTrack + 1) % playlist.length;
-                                audioPlayer.src = playlist[currentTrack];
+                        // Botão de play/pause
+                        toggleBtn.addEventListener('click', function() {{
+                            if (isPlaying) {{
+                                audioPlayer.pause();
+                                toggleBtn.textContent = '🎵';
+                                toggleBtn.style.background = 'linear-gradient(135deg, #999, #666)';
+                            }} else {{
                                 audioPlayer.play();
-                            }});
-                            
-                            // Botão de play/pause
-                            toggleBtn.addEventListener('click', function() {{
-                                if (isPlaying) {{
-                                    audioPlayer.pause();
-                                    toggleBtn.textContent = '🎵';
-                                    toggleBtn.style.background = 'linear-gradient(135deg, #999, #666)';
-                                }} else {{
-                                    audioPlayer.play();
+                                toggleBtn.textContent = '🎶';
+                                toggleBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c06c84)';
+                            }}
+                            isPlaying = !isPlaying;
+                        }});
+                        
+                        // Hover effect
+                        toggleBtn.addEventListener('mouseenter', function() {{
+                            this.style.transform = 'scale(1.1)';
+                        }});
+                        toggleBtn.addEventListener('mouseleave', function() {{
+                            this.style.transform = 'scale(1)';
+                        }});
+                        
+                        // Tentar tocar automaticamente após um delay
+                        setTimeout(() => {{
+                            audioPlayer.play()
+                                .then(() => {{
+                                    isPlaying = true;
                                     toggleBtn.textContent = '🎶';
-                                    toggleBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c06c84)';
-                                }}
-                                isPlaying = !isPlaying;
-                            }});
-                            
-                            // Hover effect
-                            toggleBtn.addEventListener('mouseenter', function() {{
-                                this.style.transform = 'scale(1.1)';
-                            }});
-                            toggleBtn.addEventListener('mouseleave', function() {{
-                                this.style.transform = 'scale(1)';
-                            }});
-                            
-                            // Tentar tocar automaticamente após um delay
-                            setTimeout(() => {{
-                                audioPlayer.play()
-                                    .then(() => {{
-                                        isPlaying = true;
-                                        toggleBtn.textContent = '🎶';
-                                        console.log('🎵 Música iniciada automaticamente!');
-                                    }})
-                                    .catch(e => {{
-                                        console.log('⚠️ Autoplay bloqueado. Clique no botão 🎵 para tocar.');
-                                        toggleBtn.style.animation = 'pulse 1s infinite';
-                                    }});
-                            }}, 500);
-                            
-                            // Animação de pulse para chamar atenção
-                            const style = document.createElement('style');
-                            style.textContent = `
-                                @keyframes pulse {{
-                                    0%, 100% {{ transform: scale(1); }}
-                                    50% {{ transform: scale(1.15); }}
-                                }}
-                            `;
-                            document.head.appendChild(style);
-                        </script>
-                    </div>
-                    """
-                    st.markdown(music_html, unsafe_allow_html=True)
-                    st.session_state.music_initialized = True
-            except Exception as e:
-                print(f"Erro ao carregar música: {e}")
+                                    console.log('🎵 Música iniciada: {music_name}');
+                                }})
+                                .catch(e => {{
+                                    console.log('⚠️ Autoplay bloqueado. Clique no botão 🎵 para tocar.');
+                                    toggleBtn.style.animation = 'pulse 1s infinite';
+                                }});
+                        }}, 500);
+                        
+                        // Animação de pulse para chamar atenção
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes pulse {{
+                                0%, 100% {{ transform: scale(1); }}
+                                50% {{ transform: scale(1.15); }}
+                            }}
+                        `;
+                        document.head.appendChild(style);
+                    </script>
+                </div>
+                """
+                st.markdown(music_html, unsafe_allow_html=True)
+        except Exception as e:
+            print(f"Erro ao carregar música: {e}")
 
 def get_image_files(directory):
     """Obtém lista de arquivos de imagem do diretório"""
@@ -1523,20 +1531,8 @@ def show_quiz_page():
 def show_proposal_page():
     """Página do pedido de casamento"""
     
-    # Carregar música "De Janeiro a Janeiro"
-    music_dir = "music"
-    music_files = get_music_files(music_dir)
-    janeiro_music = None
-    
-    for music_file in music_files:
-        if "Janeiro" in music_file or "janeiro" in music_file:
-            try:
-                with open(music_file, "rb") as audio_file:
-                    audio_bytes = audio_file.read()
-                    janeiro_music = base64.b64encode(audio_bytes).decode()
-                break
-            except Exception as e:
-                print(f"Erro ao carregar música: {e}")
+    # Nota: A música é controlada pelo player global (add_global_music)
+    # que já toca "Roberta Campos - De Janeiro a Janeiro" nesta página
     
     # Carregar foto 37 como fundo
     background_image = None
@@ -1577,22 +1573,7 @@ def show_proposal_page():
     
     st.markdown(background_css, unsafe_allow_html=True)
     
-    # Player de música específica para esta página
-    if janeiro_music:
-        st.markdown(f'''
-        <audio id="proposal-music" autoplay loop style="display: none;">
-            <source src="data:audio/mpeg;base64,{janeiro_music}" type="audio/mpeg">
-        </audio>
-        <script>
-            // Garantir que a música toque
-            setTimeout(() => {{
-                const audio = document.getElementById('proposal-music');
-                if (audio) {{
-                    audio.play().catch(e => console.log('Autoplay bloqueado:', e));
-                }}
-            }}, 100);
-        </script>
-        ''', unsafe_allow_html=True)
+    # Nota: Player de música já gerenciado pelo global (add_global_music)
     
     proposal_html = """
     <!DOCTYPE html>

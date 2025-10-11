@@ -15,18 +15,53 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS customizado
+# CSS customizado - Esconder TODOS os elementos do Streamlit
 st.markdown("""
 <style>
+    /* Esconder menu, footer e header */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Esconder toolbar/header preto do topo */
+    [data-testid="stToolbar"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Esconder header container */
+    [data-testid="stHeader"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Esconder botão de deploy/menu */
+    button[kind="header"] {
+        display: none !important;
+    }
+    
+    /* Esconder barra de status */
+    [data-testid="stStatusWidget"] {
+        display: none !important;
+    }
+    
+    /* Esconder decoração do header */
+    [data-testid="stDecoration"] {
+        display: none !important;
+    }
+    
+    /* Esconder sidebar */
+    [data-testid="stSidebar"] {
+        display: none;
+    }
+    
+    /* Ajustar padding */
     .main > div {
         padding-top: 0rem;
     }
     .block-container {
-        padding-top: 1rem;
+        padding-top: 0rem !important;
         padding-bottom: 0rem;
-    }
-    [data-testid="stSidebar"] {
-        display: none;
     }
 </style>
 """, unsafe_allow_html=True)

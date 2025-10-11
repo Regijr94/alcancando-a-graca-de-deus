@@ -139,27 +139,44 @@ def add_global_music():
                                 audioPlayer.currentTime = currentTime;
                             }}
                             
-                            // Tentar tocar a música
-                            audioPlayer.play().then(() => {{
-                                localStorage.setItem('music_is_playing', 'true');
-                                
-                                // Salvar progresso da música periodicamente
-                                setInterval(() => {{
-                                    if (!audioPlayer.paused) {{
-                                        localStorage.setItem('music_current_time', audioPlayer.currentTime.toString());
-                                    }}
-                                }}, 1000);
-                            }}).catch(e => {{
-                                console.log('Autoplay bloqueado. Clique na página para iniciar.');
-                                
-                                // Adicionar listener para primeiro clique
-                                const playOnClick = () => {{
-                                    audioPlayer.play().then(() => {{
-                                        localStorage.setItem('music_is_playing', 'true');
-                                    }});
-                                    document.removeEventListener('click', playOnClick);
-                                }};
-                                document.addEventListener('click', playOnClick);
+                            // Função para iniciar música
+                            const startMusic = () => {{
+                                audioPlayer.play().then(() => {{
+                                    localStorage.setItem('music_is_playing', 'true');
+                                    console.log('Música iniciada com sucesso!');
+                                    
+                                    // Salvar progresso da música periodicamente
+                                    setInterval(() => {{
+                                        if (!audioPlayer.paused) {{
+                                            localStorage.setItem('music_current_time', audioPlayer.currentTime.toString());
+                                        }}
+                                    }}, 1000);
+                                }}).catch(e => {{
+                                    console.log('Aguardando interação do usuário...');
+                                }});
+                            }};
+                            
+                            // Tentar tocar imediatamente
+                            startMusic();
+                            
+                            // Tentar novamente após pequeno delay
+                            setTimeout(startMusic, 100);
+                            setTimeout(startMusic, 500);
+                            
+                            // Adicionar listeners para múltiplos eventos
+                            const events = ['click', 'touchstart', 'keydown', 'scroll', 'mousemove'];
+                            const playOnInteraction = () => {{
+                                if (audioPlayer.paused) {{
+                                    startMusic();
+                                }}
+                                // Remover listeners após primeiro sucesso
+                                events.forEach(event => {{
+                                    document.removeEventListener(event, playOnInteraction);
+                                }});
+                            }};
+                            
+                            events.forEach(event => {{
+                                document.addEventListener(event, playOnInteraction, {{ once: true }});
                             }});
                         }}
                     }})();
@@ -2211,6 +2228,31 @@ def show_proposal_page():
 
 def show_gallery_page():
     """Página principal com galeria e contador"""
+    
+    # CSS para fundo romântico da galeria
+    st.markdown("""
+    <style>
+        /* Fundo romântico para a galeria */
+        .stApp {
+            background: linear-gradient(135deg, 
+                #ffecd2 0%, 
+                #fcb69f 25%, 
+                #ff9a9e 50%, 
+                #fecfef 75%, 
+                #ffecd2 100%
+            ) !important;
+            background-size: 400% 400% !important;
+            animation: gradientShift 25s ease infinite !important;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Diretórios
     pictures_dir = "pictures"
     music_dir = "music"

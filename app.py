@@ -288,72 +288,6 @@ def main():
     # Adicionar música global que toca em todas as páginas
     add_global_music()
     
-    # Botão flutuante de controle de música
-    st.markdown("""
-    <style>
-        #music-control {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        #music-control:hover {
-            background: rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
-        }
-        
-        #music-control-icon {
-            font-size: 24px;
-        }
-    </style>
-    
-    <div id="music-control" onclick="toggleMusic()">
-        <span id="music-control-icon">🎵</span>
-    </div>
-    
-    <script>
-        function toggleMusic() {
-            const audioPlayer = document.getElementById('global-music-player');
-            const icon = document.getElementById('music-control-icon');
-            
-            if (audioPlayer) {
-                if (audioPlayer.paused) {
-                    audioPlayer.play().then(() => {
-                        icon.textContent = '🎵';
-                        localStorage.setItem('music_is_playing', 'true');
-                    });
-                } else {
-                    audioPlayer.pause();
-                    icon.textContent = '🔇';
-                    localStorage.setItem('music_is_playing', 'false');
-                }
-            }
-        }
-        
-        // Atualizar ícone baseado no estado atual
-        setInterval(() => {
-            const audioPlayer = document.getElementById('global-music-player');
-            const icon = document.getElementById('music-control-icon');
-            if (audioPlayer && icon) {
-                icon.textContent = audioPlayer.paused ? '🔇' : '🎵';
-            }
-        }, 500);
-    </script>
-    """, unsafe_allow_html=True)
-    
     # Verificar query params para mudança de página (compatível com versões antigas)
     try:
         # Tentar nova API primeiro
@@ -2968,10 +2902,19 @@ def show_gallery_page():
                 z-index: 100;
                 transition: all 0.3s;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                display: none; /* Inicialmente escondido */
+                animation: fadeInBtn 0.5s ease-in-out;
+            }}
+            #quiz-btn.show {{
+                display: block;
             }}
             #quiz-btn:hover {{
                 transform: scale(1.05);
                 box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            }}
+            @keyframes fadeInBtn {{
+                from {{ opacity: 0; transform: translateY(-20px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
             }}
             #info {{
                 position: absolute;
@@ -3095,11 +3038,12 @@ def show_gallery_page():
                     viewedPhotos = index;
                 }}
                 
-                // Se chegou na última foto, redirecionar para o quiz após 3 segundos
-                if (index === total - 1 && viewedPhotos === total - 1) {{
-                    setTimeout(() => {{
-                        window.location.href = '?page=quiz';
-                    }}, 3000);
+                // Verificar se viu todas as fotos/vídeos
+                if (viewedPhotos === total - 1) {{
+                    const quizBtn = document.getElementById('quiz-btn');
+                    if (quizBtn) {{
+                        quizBtn.classList.add('show');
+                    }}
                 }}
             }}
             

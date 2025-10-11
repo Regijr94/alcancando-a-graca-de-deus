@@ -66,6 +66,9 @@ def add_global_music():
                 music_name = "Alceu Valença - La Belle de Jour"
             
             if selected_music:
+                # Criar chave segura para localStorage
+                music_key_safe = music_name.replace(" ", "_").replace("-", "_")
+                
                 # HTML com player de música específica por página
                 music_html = f"""
                 <div id="global-music-player" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
@@ -95,7 +98,7 @@ def add_global_music():
                         let isPlaying = false;
                         
                         // Salvar e restaurar posição da música entre recargas
-                        const MUSIC_KEY = 'music_position_{music_name.replace(" ", "_")}';
+                        const MUSIC_KEY = 'music_position_{music_key_safe}';
                         const MUSIC_PLAYING_KEY = 'music_playing';
                         
                         // Restaurar posição da música anterior

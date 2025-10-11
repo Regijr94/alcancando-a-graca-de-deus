@@ -285,16 +285,50 @@ def main():
 def show_intro_page():
     """Página de introdução com mensagem animada e tema romântico"""
     
-    # CSS para o fundo romântico - aplicado globalmente no Streamlit
-    st.markdown("""
-    <style>
-        /* Remover padding padrão do Streamlit */
-        .main .block-container {
-            padding: 0 !important;
-            max-width: 100% !important;
-        }
+    # Carregar fotos do diretório pictures para o mosaico
+    pictures_dir = "pictures"
+    image_files = get_image_files(pictures_dir)
+    
+    # Converter até 20 fotos aleatórias para base64 (para não sobrecarregar)
+    import random
+    selected_images = random.sample(image_files, min(20, len(image_files))) if image_files else []
+    images_base64 = []
+    
+    for img_path in selected_images:
+        img_b64 = image_to_base64(img_path, max_width=400)  # Menor resolução para mosaico
+        if img_b64:
+            images_base64.append(img_b64)
+    
+    # Criar CSS do mosaico de fotos
+    mosaic_style = ""
+    if images_base64:
+        mosaic_images = ", ".join([f"url('{img}')" for img in images_base64[:12]])  # Usar até 12 fotos
+        mosaic_style = f"""
+        /* Mosaico de fotos de fundo */
+        .stApp {{
+            background: 
+                linear-gradient(rgba(255, 154, 158, 0.85), rgba(252, 182, 159, 0.85)),
+                {mosaic_images};
+            background-size: 
+                cover,
+                {'25% 25%, ' * 12};
+            background-position: 
+                center,
+                0% 0%, 25% 0%, 50% 0%, 75% 0%,
+                0% 33%, 25% 33%, 50% 33%, 75% 33%,
+                0% 66%, 25% 66%, 50% 66%, 75% 66%;
+            background-repeat: no-repeat;
+            animation: mosaicShift 30s ease infinite !important;
+        }}
         
-        /* Fundo romântico animado */
+        @keyframes mosaicShift {{
+            0%, 100% {{ filter: brightness(1) saturate(1.2); }}
+            50% {{ filter: brightness(1.1) saturate(1.3); }}
+        }}
+        """
+    else:
+        # Fallback para gradiente se não houver fotos
+        mosaic_style = """
         .stApp {
             background: linear-gradient(135deg, 
                 #ff9a9e 0%, 
@@ -313,9 +347,21 @@ def show_intro_page():
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        """
+    
+    # CSS para o fundo romântico - aplicado globalmente no Streamlit
+    st.markdown(f"""
+    <style>
+        /* Remover padding padrão do Streamlit */
+        .main .block-container {{
+            padding: 0 !important;
+            max-width: 100% !important;
+        }}
+        
+        {mosaic_style}
         
         /* Overlay romântico */
-        .stApp::before {
+        .stApp::before {{
             content: '';
             position: fixed;
             top: 0;
@@ -323,12 +369,12 @@ def show_intro_page():
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.3) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.2) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
-        }
+        }}
     </style>
     """, unsafe_allow_html=True)
     
@@ -345,21 +391,27 @@ def show_intro_page():
         except Exception as e:
             print(f"Erro ao carregar música: {e}")
     
-    intro_html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Pacifico&family=Crimson+Text:ital@1&display=swap" rel="stylesheet">
-        <style>
-            * {{
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }}
-            
-            body {{
-                margin: 0;
-                padding: 0;
+    # Criar CSS do body com mosaico
+    body_background = ""
+    if images_base64:
+        mosaic_images_html = ", ".join([f"url('{img}')" for img in images_base64[:12]])
+        body_background = f"""
+                background: 
+                    linear-gradient(rgba(255, 154, 158, 0.85), rgba(252, 182, 159, 0.85)),
+                    {mosaic_images_html};
+                background-size: 
+                    cover,
+                    {'25% 25%, ' * 12};
+                background-position: 
+                    center,
+                    0% 0%, 25% 0%, 50% 0%, 75% 0%,
+                    0% 33%, 25% 33%, 50% 33%, 75% 33%,
+                    0% 66%, 25% 66%, 50% 66%, 75% 66%;
+                background-repeat: no-repeat;
+                animation: mosaicShift 30s ease infinite;
+        """
+    else:
+        body_background = """
                 background: linear-gradient(135deg, 
                     #ff9a9e 0%, 
                     #fecfef 20%, 
@@ -370,6 +422,24 @@ def show_intro_page():
                 );
                 background-size: 400% 400%;
                 animation: gradientShift 25s ease infinite;
+        """
+    
+    intro_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Pacifico&family=Crimson+Text:ital@1&display=swap" rel="stylesheet">
+        <style>
+            * {{{{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}}}
+            
+            body {{{{
+                margin: 0;
+                padding: 0;
+                {body_background}
                 height: 100vh;
                 width: 100vw;
                 display: flex;
@@ -377,10 +447,10 @@ def show_intro_page():
                 align-items: center;
                 overflow: hidden;
                 position: relative;
-            }}
+            }}}}
             
             /* Overlay romântico */
-            body::before {{
+            body::before {{{{
                 content: '';
                 position: absolute;
                 top: 0;
@@ -388,20 +458,25 @@ def show_intro_page():
                 width: 100%;
                 height: 100%;
                 background: 
-                    radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
-                    radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.3) 0%, transparent 50%);
+                    radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.2) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.2) 0%, transparent 50%);
                 pointer-events: none;
                 z-index: 1;
-            }}
+            }}}}
             
-            @keyframes gradientShift {{
-                0% {{ background-position: 0% 50%; }}
-                50% {{ background-position: 100% 50%; }}
-                100% {{ background-position: 0% 50%; }}
-            }}
+            @keyframes gradientShift {{{{
+                0% {{{{ background-position: 0% 50%; }}}}
+                50% {{{{ background-position: 100% 50%; }}}}
+                100% {{{{ background-position: 0% 50%; }}}}
+            }}}}
+            
+            @keyframes mosaicShift {{{{
+                0%, 100% {{{{ filter: brightness(1) saturate(1.2); }}}}
+                50% {{{{ filter: brightness(1.1) saturate(1.3); }}}}
+            }}}}
             /* Corações flutuantes de fundo - mais suaves e românticos */
-            .heart {{
+            .heart {{{{
                 position: absolute;
                 font-size: 30px;
                 opacity: 0;
@@ -409,62 +484,62 @@ def show_intro_page():
                 pointer-events: none;
                 z-index: 2;
                 filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.6));
-            }}
+            }}}}
             
-            .heart:nth-child(1) {{ left: 5%; font-size: 28px; animation-delay: 0s; }}
-            .heart:nth-child(2) {{ left: 15%; font-size: 36px; animation-delay: 2.5s; }}
-            .heart:nth-child(3) {{ left: 25%; font-size: 32px; animation-delay: 5s; }}
-            .heart:nth-child(4) {{ left: 35%; font-size: 30px; animation-delay: 1.5s; }}
-            .heart:nth-child(5) {{ left: 45%; font-size: 34px; animation-delay: 3.5s; }}
-            .heart:nth-child(6) {{ left: 55%; font-size: 42px; animation-delay: 6s; }}
-            .heart:nth-child(7) {{ left: 65%; font-size: 26px; animation-delay: 7.5s; }}
-            .heart:nth-child(8) {{ left: 75%; font-size: 38px; animation-delay: 4s; }}
-            .heart:nth-child(9) {{ left: 85%; font-size: 31px; animation-delay: 8.5s; }}
-            .heart:nth-child(10) {{ left: 95%; font-size: 35px; animation-delay: 10s; }}
-            .heart:nth-child(21) {{ left: 10%; font-size: 24px; animation-delay: 11s; }}
-            .heart:nth-child(22) {{ left: 20%; font-size: 40px; animation-delay: 12s; }}
-            .heart:nth-child(23) {{ left: 30%; font-size: 29px; animation-delay: 13s; }}
-            .heart:nth-child(24) {{ left: 40%; font-size: 33px; animation-delay: 14s; }}
-            .heart:nth-child(25) {{ left: 50%; font-size: 27px; animation-delay: 15s; }}
+            .heart:nth-child(1) {{{{ left: 5%; font-size: 28px; animation-delay: 0s; }}}}
+            .heart:nth-child(2) {{{{ left: 15%; font-size: 36px; animation-delay: 2.5s; }}}}
+            .heart:nth-child(3) {{{{ left: 25%; font-size: 32px; animation-delay: 5s; }}}}
+            .heart:nth-child(4) {{{{ left: 35%; font-size: 30px; animation-delay: 1.5s; }}}}
+            .heart:nth-child(5) {{{{ left: 45%; font-size: 34px; animation-delay: 3.5s; }}}}
+            .heart:nth-child(6) {{{{ left: 55%; font-size: 42px; animation-delay: 6s; }}}}
+            .heart:nth-child(7) {{{{ left: 65%; font-size: 26px; animation-delay: 7.5s; }}}}
+            .heart:nth-child(8) {{{{ left: 75%; font-size: 38px; animation-delay: 4s; }}}}
+            .heart:nth-child(9) {{{{ left: 85%; font-size: 31px; animation-delay: 8.5s; }}}}
+            .heart:nth-child(10) {{{{ left: 95%; font-size: 35px; animation-delay: 10s; }}}}
+            .heart:nth-child(21) {{{{ left: 10%; font-size: 24px; animation-delay: 11s; }}}}
+            .heart:nth-child(22) {{{{ left: 20%; font-size: 40px; animation-delay: 12s; }}}}
+            .heart:nth-child(23) {{{{ left: 30%; font-size: 29px; animation-delay: 13s; }}}}
+            .heart:nth-child(24) {{{{ left: 40%; font-size: 33px; animation-delay: 14s; }}}}
+            .heart:nth-child(25) {{{{ left: 50%; font-size: 27px; animation-delay: 15s; }}}}
             
-            @keyframes floatHearts {{
-                0% {{ 
+            @keyframes floatHearts {{{{
+                0% {{{{ 
                     transform: translateY(110vh) translateX(0) rotate(-15deg) scale(0.3); 
                     opacity: 0; 
-                }}
-                5% {{ 
+                }}}}
+                5% {{{{ 
                     opacity: 0.6; 
-                }}
-                15% {{ 
+                }}}}
+                15% {{{{ 
                     opacity: 0.9; 
                     transform: translateY(85vh) translateX(20px) rotate(15deg) scale(0.9);
-                }}
-                30% {{ 
+                }}}}
+                30% {{{{ 
                     opacity: 1; 
                     transform: translateY(70vh) translateX(-10px) rotate(-20deg) scale(1.1);
-                }}
-                45% {{ 
+                }}}}
+                45% {{{{ 
                     opacity: 0.95; 
                     transform: translateY(55vh) translateX(15px) rotate(25deg) scale(1);
-                }}
-                60% {{ 
+                }}}}
+                60% {{{{ 
                     opacity: 0.9; 
                     transform: translateY(40vh) translateX(-20px) rotate(-30deg) scale(1.15);
-                }}
-                75% {{ 
+                }}}}
+                75% {{{{ 
                     opacity: 0.8; 
                     transform: translateY(25vh) translateX(10px) rotate(20deg) scale(0.95);
-                }}
-                90% {{ 
+                }}}}
+                90% {{{{ 
                     opacity: 0.5; 
                     transform: translateY(10vh) translateX(-15px) rotate(-25deg) scale(0.8);
-                }}
-                100% {{ 
+                }}}}
+                100% {{{{ 
                     transform: translateY(-10vh) translateX(0) rotate(0deg) scale(0.4); 
                     opacity: 0; 
-                }}
-            }}
-            .intro-container {{
+                }}}}
+            }}}}
+            .intro-container {{{{
                 text-align: center;
                 color: white;
                 padding: 40px;
@@ -478,9 +553,9 @@ def show_intro_page():
                 box-shadow: 
                     0 8px 32px rgba(255, 105, 180, 0.3),
                     inset 0 0 20px rgba(255, 255, 255, 0.1);
-            }}
+            }}}}
             
-            #typed-text {{
+            #typed-text {{{{
                 font-family: 'Allura', cursive;
                 font-size: 38px;
                 line-height: 1.5;
@@ -496,15 +571,15 @@ def show_intro_page():
                 justify-content: center;
                 text-align: center;
                 padding: 30px;
-            }}
-            .cursor {{
+            }}}}
+            .cursor {{{{
                 display: inline-block;
                 width: 4px;
                 background-color: white;
                 margin-left: 3px;
                 animation: blink 0.7s infinite;
-            }}
-            #infinity-container {{
+            }}}}
+            #infinity-container {{{{
                 display: none;
                 position: fixed;
                 top: 0;
@@ -517,8 +592,8 @@ def show_intro_page():
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-            }}
-            #infinity {{
+            }}}}
+            #infinity {{{{
                 font-size: 120px;
                 animation: pulse 1.5s infinite;
                 color: #fff;
@@ -530,8 +605,8 @@ def show_intro_page():
                 padding: 0;
                 font-weight: 900;
                 line-height: 1;
-            }}
-            #infinity-text {{
+            }}}}
+            #infinity-text {{{{
                 font-family: 'Allura', cursive;
                 font-size: 32px;
                 color: #fff;
@@ -544,104 +619,104 @@ def show_intro_page():
                 padding: 0 20px;
                 max-width: 90%;
                 line-height: 1.4;
-            }}
-            @keyframes pulse {{
-                0%, 100% {{ 
+            }}}}
+            @keyframes pulse {{{{
+                0%, 100% {{{{ 
                     opacity: 0.4; 
                     transform: scale(1) rotate(0deg);
-                }}
-                50% {{ 
+                }}}}
+                50% {{{{ 
                     opacity: 1; 
                     transform: scale(1.15) rotate(8deg);
-                }}
-            }}
-            @keyframes blink {{
-                0%, 50% {{ opacity: 1; }}
-                51%, 100% {{ opacity: 0; }}
-            }}
-            @keyframes fallAndDisappear {{
-                0% {{ 
+                }}}}
+            }}}}
+            @keyframes blink {{{{
+                0%, 50% {{{{ opacity: 1; }}}}
+                51%, 100% {{{{ opacity: 0; }}}}
+            }}}}
+            @keyframes fallAndDisappear {{{{
+                0% {{{{ 
                     transform: translateY(0) scale(1) rotate(0deg);
                     opacity: 1;
-                }}
-                50% {{
+                }}}}
+                50% {{{{
                     transform: translateY(150px) scale(0.9) rotate(-5deg);
                     opacity: 0.5;
-                }}
-                100% {{ 
+                }}}}
+                100% {{{{ 
                     transform: translateY(300px) scale(0.5) rotate(-10deg);
                     opacity: 0;
-                }}
-            }}
-            .fall-and-disappear {{
+                }}}}
+            }}}}
+            .fall-and-disappear {{{{
                 animation: fallAndDisappear 1.5s ease-in forwards;
-            }}
-            @keyframes fadeInInfinity {{
-                from {{ 
+            }}}}
+            @keyframes fadeInInfinity {{{{
+                from {{{{ 
                     opacity: 0;
                     transform: scale(0.5);
-                }}
-                to {{ 
+                }}}}
+                to {{{{ 
                     opacity: 1;
                     transform: scale(1);
-                }}
-            }}
-            @keyframes fadeInText {{
-                from {{ opacity: 0; }}
-                to {{ opacity: 1; }}
-            }}
+                }}}}
+            }}}}
+            @keyframes fadeInText {{{{
+                from {{{{ opacity: 0; }}}}
+                to {{{{ opacity: 1; }}}}
+            }}}}
             
             /* Otimização para celular e tablets */
-            @media (max-width: 768px) {{
-                #typed-text {{
+            @media (max-width: 768px) {{{{
+                #typed-text {{{{
                     font-size: 28px;
                     min-height: 250px;
                     padding: 20px;
-                }}
-                #infinity {{
+                }}}}
+                #infinity {{{{
                     font-size: 80px;
-                }}
-                #infinity-text {{
+                }}}}
+                #infinity-text {{{{
                     font-size: 24px;
                     padding: 0 15px;
-                }}
-                .intro-container {{
+                }}}}
+                .intro-container {{{{
                     padding: 20px;
                     max-width: 95%;
-                }}
-            }}
+                }}}}
+            }}}}
             
-            @media (max-width: 480px) {{
-                #typed-text {{
+            @media (max-width: 480px) {{{{
+                #typed-text {{{{
                     font-size: 22px;
                     min-height: 200px;
                     padding: 15px;
-                }}
-                #infinity {{
+                }}}}
+                #infinity {{{{
                     font-size: 60px;
-                }}
-                #infinity-text {{
+                }}}}
+                #infinity-text {{{{
                     font-size: 20px;
                     padding: 0 10px;
-                }}
-                .intro-container {{
+                }}}}
+                .intro-container {{{{
                     padding: 15px;
-                }}
-            }}
+                }}}}
+            }}}}
             
-            @keyframes fadeOut {{
-                from {{ opacity: 1; }}
-                to {{ opacity: 0; }}
-            }}
-            .fade-in-infinity {{
+            @keyframes fadeOut {{{{
+                from {{{{ opacity: 1; }}}}
+                to {{{{ opacity: 0; }}}}
+            }}}}
+            .fade-in-infinity {{{{
                 animation: fadeInInfinity 1.5s forwards;
-            }}
-            .fade-out {{
+            }}}}
+            .fade-out {{{{
                 animation: fadeOut 2s forwards;
-            }}
+            }}}}
             
             /* Estrelas piscando */
-            .star {{
+            .star {{{{
                 position: absolute;
                 color: white;
                 font-size: 20px;
@@ -649,20 +724,20 @@ def show_intro_page():
                 animation: twinkle 3s infinite;
                 pointer-events: none;
                 z-index: 2;
-            }}
-            .star:nth-child(11) {{ top: 10%; left: 20%; animation-delay: 0s; }}
-            .star:nth-child(12) {{ top: 20%; left: 80%; animation-delay: 1s; }}
-            .star:nth-child(13) {{ top: 30%; left: 10%; animation-delay: 2s; }}
-            .star:nth-child(14) {{ top: 40%; left: 90%; animation-delay: 0.5s; }}
-            .star:nth-child(15) {{ top: 60%; left: 15%; animation-delay: 1.5s; }}
-            .star:nth-child(16) {{ top: 70%; left: 85%; animation-delay: 2.5s; }}
-            .star:nth-child(17) {{ top: 80%; left: 30%; animation-delay: 0.8s; }}
-            .star:nth-child(18) {{ top: 15%; left: 60%; animation-delay: 1.8s; }}
+            }}}}
+            .star:nth-child(11) {{{{ top: 10%; left: 20%; animation-delay: 0s; }}}}
+            .star:nth-child(12) {{{{ top: 20%; left: 80%; animation-delay: 1s; }}}}
+            .star:nth-child(13) {{{{ top: 30%; left: 10%; animation-delay: 2s; }}}}
+            .star:nth-child(14) {{{{ top: 40%; left: 90%; animation-delay: 0.5s; }}}}
+            .star:nth-child(15) {{{{ top: 60%; left: 15%; animation-delay: 1.5s; }}}}
+            .star:nth-child(16) {{{{ top: 70%; left: 85%; animation-delay: 2.5s; }}}}
+            .star:nth-child(17) {{{{ top: 80%; left: 30%; animation-delay: 0.8s; }}}}
+            .star:nth-child(18) {{{{ top: 15%; left: 60%; animation-delay: 1.8s; }}}}
             
-            @keyframes twinkle {{
-                0%, 100% {{ opacity: 0; transform: scale(0.5); }}
-                50% {{ opacity: 1; transform: scale(1.2); }}
-            }}
+            @keyframes twinkle {{{{
+                0%, 100% {{{{ opacity: 0; transform: scale(0.5); }}}}
+                50% {{{{ opacity: 1; transform: scale(1.2); }}}}
+            }}}}
         </style>
     </head>
     <body>

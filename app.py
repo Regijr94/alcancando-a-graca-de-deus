@@ -118,19 +118,51 @@ def add_global_music():
                 music_name = "Alceu Valença - La Belle de Jour"
             
             if selected_music:
-                # HTML com player de música simples - toca automaticamente
+                # HTML com player de música persistente usando localStorage
                 music_html = f"""
-                <audio autoplay loop style="display: none;">
+                <audio id="global-music-player" loop style="display: none;">
                     <source src="data:audio/mpeg;base64,{selected_music}" type="audio/mpeg">
                 </audio>
                 <script>
-                    // Garantir que a música toque automaticamente
-                    const audioElements = document.querySelectorAll('audio');
-                    audioElements.forEach(audio => {{
-                        setTimeout(() => {{
-                            audio.play().catch(e => console.log('Autoplay: usuário precisa interagir primeiro'));
-                        }}, 100);
-                    }});
+                    // Player de música persistente que não recarrega entre páginas
+                    (function() {{
+                        const audioPlayer = document.getElementById('global-music-player');
+                        const musicKey = 'music_playing_{current_page}';
+                        
+                        // Verificar se a música já está tocando
+                        const isMusicPlaying = localStorage.getItem('music_is_playing') === 'true';
+                        const currentTime = parseFloat(localStorage.getItem('music_current_time') || '0');
+                        
+                        if (audioPlayer) {{
+                            // Restaurar tempo se for a mesma música
+                            if (isMusicPlaying && currentTime > 0) {{
+                                audioPlayer.currentTime = currentTime;
+                            }}
+                            
+                            // Tentar tocar a música
+                            audioPlayer.play().then(() => {{
+                                localStorage.setItem('music_is_playing', 'true');
+                                
+                                // Salvar progresso da música periodicamente
+                                setInterval(() => {{
+                                    if (!audioPlayer.paused) {{
+                                        localStorage.setItem('music_current_time', audioPlayer.currentTime.toString());
+                                    }}
+                                }}, 1000);
+                            }}).catch(e => {{
+                                console.log('Autoplay bloqueado. Clique na página para iniciar.');
+                                
+                                // Adicionar listener para primeiro clique
+                                const playOnClick = () => {{
+                                    audioPlayer.play().then(() => {{
+                                        localStorage.setItem('music_is_playing', 'true');
+                                    }});
+                                    document.removeEventListener('click', playOnClick);
+                                }};
+                                document.addEventListener('click', playOnClick);
+                            }});
+                        }}
+                    }})();
                 </script>
                 """
                 st.markdown(music_html, unsafe_allow_html=True)

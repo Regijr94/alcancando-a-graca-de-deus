@@ -94,16 +94,37 @@ def add_global_music():
                         const toggleBtn = document.getElementById('music-toggle-btn');
                         let isPlaying = false;
                         
+                        // Salvar e restaurar posição da música entre recargas
+                        const MUSIC_KEY = 'music_position_{music_name.replace(" ", "_")}';
+                        const MUSIC_PLAYING_KEY = 'music_playing';
+                        
+                        // Restaurar posição da música anterior
+                        const savedPosition = localStorage.getItem(MUSIC_KEY);
+                        const wasPlaying = localStorage.getItem(MUSIC_PLAYING_KEY) === 'true';
+                        if (savedPosition) {{
+                            audioPlayer.currentTime = parseFloat(savedPosition);
+                        }}
+                        
+                        // Salvar posição periodicamente
+                        setInterval(() => {{
+                            if (!audioPlayer.paused) {{
+                                localStorage.setItem(MUSIC_KEY, audioPlayer.currentTime);
+                                localStorage.setItem(MUSIC_PLAYING_KEY, 'true');
+                            }}
+                        }}, 1000);
+                        
                         // Botão de play/pause
                         toggleBtn.addEventListener('click', function() {{
                             if (isPlaying) {{
                                 audioPlayer.pause();
                                 toggleBtn.textContent = '🎵';
                                 toggleBtn.style.background = 'linear-gradient(135deg, #999, #666)';
+                                localStorage.setItem(MUSIC_PLAYING_KEY, 'false');
                             }} else {{
                                 audioPlayer.play();
                                 toggleBtn.textContent = '🎶';
                                 toggleBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c06c84)';
+                                localStorage.setItem(MUSIC_PLAYING_KEY, 'true');
                             }}
                             isPlaying = !isPlaying;
                         }});
@@ -118,16 +139,19 @@ def add_global_music():
                         
                         // Tentar tocar automaticamente após um delay
                         setTimeout(() => {{
-                            audioPlayer.play()
-                                .then(() => {{
-                                    isPlaying = true;
-                                    toggleBtn.textContent = '🎶';
-                                    console.log('🎵 Música iniciada: {music_name}');
-                                }})
-                                .catch(e => {{
-                                    console.log('⚠️ Autoplay bloqueado. Clique no botão 🎵 para tocar.');
-                                    toggleBtn.style.animation = 'pulse 1s infinite';
-                                }});
+                            // Se estava tocando antes, continuar
+                            if (wasPlaying || !savedPosition) {{
+                                audioPlayer.play()
+                                    .then(() => {{
+                                        isPlaying = true;
+                                        toggleBtn.textContent = '🎶';
+                                        console.log('🎵 Música iniciada/continuada: {music_name}');
+                                    }})
+                                    .catch(e => {{
+                                        console.log('⚠️ Autoplay bloqueado. Clique no botão 🎵 para tocar.');
+                                        toggleBtn.style.animation = 'pulse 1s infinite';
+                                    }});
+                            }}
                         }}, 500);
                         
                         // Animação de pulse para chamar atenção
@@ -797,8 +821,8 @@ def show_intro_page():
                 // Aguardar fade out completar
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                // Mudar para a galeria
-                window.location.href = '?page=gallery';
+                // Mudar para a galeria SEM recarregar (navegação suave)
+                window.location.href = '?page=quiz';
             }
             
             // Iniciar animação

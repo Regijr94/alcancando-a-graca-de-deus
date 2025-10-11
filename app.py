@@ -1131,8 +1131,8 @@ def show_intro_page():
         </div>
         
         <script>
-            const text1 = "Meu amor, agora construí minha própria aplicação";
-            const text2 = "Só para te dizer o quanto te amo, e sou feliz por ter você";
+            const text1 = "Sou grato, e agradeço a Deus por ter você em minha vida <3";
+            const text2 = "Fiz essa aplicação para comemorar nossas conquistas e nosso amor.";
             const typedTextElement = document.getElementById('typed-text');
             const infinityContainer = document.getElementById('infinity-container');
             let index = 0;

@@ -1467,10 +1467,10 @@ def show_quiz_page():
     # Container da pergunta atual
     st.markdown(f"""
     <div style="
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.45);
         backdrop-filter: blur(15px);
         border-radius: 25px;
-        border: 3px solid rgba(255, 255, 255, 0.9);
+        border: 3px solid rgba(255, 255, 255, 0.6);
         padding: 50px;
         margin: 40px auto;
         max-width: 950px;
@@ -1479,8 +1479,8 @@ def show_quiz_page():
         <h3 style="
             font-family: 'Dancing Script', cursive;
             font-size: 44px;
-            color: #2c3e50;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+            color: #000000;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
             margin-bottom: 30px;
             text-align: center;
             line-height: 1.6;
@@ -1519,7 +1519,7 @@ def show_quiz_page():
         }
         
         div[data-testid="stRadio"] label[data-baseweb="radio"] {
-            background: rgba(255, 255, 255, 0.80) !important;
+            background: rgba(255, 255, 255, 0.50) !important;
             backdrop-filter: blur(12px) !important;
             border-radius: 18px !important;
             padding: 25px 40px !important;
@@ -1531,7 +1531,7 @@ def show_quiz_page():
         }
         
         div[data-testid="stRadio"] label[data-baseweb="radio"]:hover {
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: rgba(255, 255, 255, 0.75) !important;
             border-color: rgba(255, 105, 180, 0.7) !important;
             transform: scale(1.03) !important;
             box-shadow: 0 6px 20px rgba(255, 105, 180, 0.3) !important;
@@ -1540,8 +1540,8 @@ def show_quiz_page():
         div[data-testid="stRadio"] label[data-baseweb="radio"] span {
             font-family: 'Dancing Script', cursive !important;
             font-size: 26px !important;
-            color: #2c3e50 !important;
-            text-shadow: 0.5px 0.5px 1px rgba(255,255,255,0.5) !important;
+            color: #000000 !important;
+            text-shadow: 0.5px 0.5px 2px rgba(255,255,255,0.8) !important;
             font-weight: bold !important;
         }
         

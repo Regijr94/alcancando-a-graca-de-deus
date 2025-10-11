@@ -1285,7 +1285,7 @@ def show_intro_page():
     # Digitação (~8s) + pausa (2s) + fade out (1s) + infinito (8s) = ~19s
     import time
     time.sleep(19)
-    st.session_state.page = 'quiz'
+    st.session_state.page = 'gallery'
     st.rerun()
 
 def show_quiz_page():
@@ -1506,11 +1506,46 @@ def show_quiz_page():
         </div>
         """, unsafe_allow_html=True)
         
-        # Auto-avançar para galeria após 5 segundos
-        import time
-        time.sleep(5)
-        st.session_state.page = 'gallery'
-        st.rerun()
+        # Adicionar espaço
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
+        # Botão centralizado para ir ao pedido
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            # CSS para o botão
+            st.markdown("""
+            <style>
+                div.stButton > button {
+                    width: 100%;
+                    height: 80px;
+                    font-size: 36px;
+                    font-weight: bold;
+                    font-family: 'Dancing Script', cursive;
+                    background: linear-gradient(135deg, #ff6b9d, #c06c84);
+                    color: white;
+                    border: 4px solid white;
+                    border-radius: 25px;
+                    box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
+                    animation: buttonPulse 2s ease-in-out infinite;
+                    transition: all 0.3s ease;
+                }
+                
+                div.stButton > button:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 12px 48px rgba(255, 105, 180, 0.7);
+                }
+                
+                @keyframes buttonPulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            if st.button("💕 Clique Aqui 💕", key="go_to_proposal_btn", use_container_width=True):
+                st.session_state.page = 'proposal'
+                st.rerun()
+        
         return
     
     # Mostrar pergunta atual
@@ -2515,80 +2550,9 @@ def show_gallery_page():
                 right: 200px;
                 z-index: 100;
             }}
-            #progress-container {{
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                z-index: 200;
-                background: rgba(0, 0, 0, 0.9);
-                padding: 15px 20px;
-            }}
-            #progress-bar {{
-                width: 100%;
-                height: 30px;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 15px;
-                overflow: hidden;
-                border: 2px solid rgba(255, 255, 255, 0.5);
-            }}
-            #progress-fill {{
-                height: 100%;
-                background: linear-gradient(90deg, #ff6b9d, #feca57, #48dbfb, #ff6b9d);
-                background-size: 200% 100%;
-                animation: progressGradient 3s ease infinite;
-                transition: width 0.5s ease;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                font-size: 16px;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            }}
-            @keyframes progressGradient {{
-                0% {{ background-position: 0% 50%; }}
-                50% {{ background-position: 100% 50%; }}
-                100% {{ background-position: 0% 50%; }}
-            }}
-            .progress-hidden {{
-                display: none;
-            }}
-            
-            /* Responsivo para celular - Barra de Progresso */
-            @media (max-width: 768px) {{
-                #progress-container {{
-                    padding: 10px 15px;
-                }}
-                #progress-bar {{
-                    height: 25px;
-                }}
-                #progress-fill {{
-                    font-size: 14px;
-                }}
-            }}
-            
-            @media (max-width: 480px) {{
-                #progress-container {{
-                    padding: 8px 10px;
-                }}
-                #progress-bar {{
-                    height: 20px;
-                    border-radius: 10px;
-                }}
-                #progress-fill {{
-                    font-size: 12px;
-                }}
-            }}
         </style>
     </head>
     <body>
-        <div id="progress-container">
-            <div id="progress-bar">
-                <div id="progress-fill" style="width: 0%;">0%</div>
-            </div>
-        </div>
-        
         <div id="carousel-container">
             {''.join([
                 f'<video class="carousel-video" id="media-{i}" controls muted loop><source src="{m["data"]}" type="{m["mime"]}"></video>' 
@@ -2612,23 +2576,7 @@ def show_gallery_page():
             let current = 0;
             let total = {len(media_list)};
             const verses = {poesia_versos};
-            
-            function updateProgress() {{
-                const progress = Math.round(((current + 1) / total) * 100);
-                const progressFill = document.getElementById('progress-fill');
-                const progressContainer = document.getElementById('progress-container');
-                
-                progressFill.style.width = progress + '%';
-                progressFill.textContent = progress + '%';
-                
-                // Quando chegar em 100%, esconder barra após 2 segundos
-                if (progress === 100) {{
-                    setTimeout(() => {{
-                        progressContainer.classList.add('progress-hidden');
-                        localStorage.setItem('lastPhotoReached', 'true');
-                    }}, 2000);
-                }}
-            }}
+            let viewedPhotos = 0;
             
             function show(index) {{
                 // Pausar todos os vídeos e remover classe active
@@ -2662,8 +2610,17 @@ def show_gallery_page():
                 
                 current = index;
                 
-                // Atualizar barra de progresso
-                updateProgress();
+                // Incrementar fotos vistas
+                if (index > viewedPhotos) {{
+                    viewedPhotos = index;
+                }}
+                
+                // Se chegou na última foto, redirecionar para o quiz após 3 segundos
+                if (index === total - 1 && viewedPhotos === total - 1) {{
+                    setTimeout(() => {{
+                        window.location.href = '?page=quiz';
+                    }}, 3000);
+                }}
             }}
             
             function next() {{
@@ -2700,154 +2657,6 @@ def show_gallery_page():
     
     # Renderizar carrossel
     components.html(carousel_html, height=800, scrolling=False)
-    
-    # Sistema de cliques para ir ao pedido - aparece após 100% da barra
-    if 'click_count' not in st.session_state:
-        st.session_state.click_count = 0
-    if 'progress_complete' not in st.session_state:
-        st.session_state.progress_complete = False
-    
-    import random
-    
-    # Gerar posição aleatória para o botão
-    if 'button_position' not in st.session_state:
-        st.session_state.button_position = {'top': random.randint(15, 75), 'left': random.randint(15, 75)}
-    
-    # Verificar se chegou em 100% via query params ou botão escondido
-    # Adicionar um pequeno script para detectar quando chegar em 100%
-    check_script = """
-    <script>
-        // Verificar localStorage periodicamente
-        setInterval(() => {
-            if (localStorage.getItem('lastPhotoReached') === 'true') {
-                // Forçar reload para mostrar botão
-                if (!window.location.search.includes('progress=100')) {
-                    window.location.search = '?progress=100';
-                }
-            }
-        }, 1000);
-    </script>
-    """
-    st.markdown(check_script, unsafe_allow_html=True)
-    
-    # Verificar se chegou em 100% via URL
-    try:
-        if 'progress' in st.query_params and st.query_params['progress'] == '100':
-            st.session_state.progress_complete = True
-    except:
-        pass
-    
-    # Adicionar espaço
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    
-    # Botão escondido para ativar quando chegar em 100%
-    if not st.session_state.progress_complete:
-        # Mostrar um botão bem pequeno e discreto para debug
-        col1, col2, col3 = st.columns([5, 1, 5])
-        with col2:
-            if st.button("✓", key="check_progress_hidden", help="Progresso completo"):
-                st.session_state.progress_complete = True
-                st.rerun()
-    
-    # Mostrar botão APENAS se progresso completou (100%)
-    if st.session_state.progress_complete:
-        # Contador de cliques
-        st.markdown(f"""
-        <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9998;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 30px;
-            border-radius: 20px;
-            border: 2px solid #ff6b9d;
-            font-family: 'Dancing Script', cursive;
-            font-size: 20px;
-            color: #ff6b9d;
-            font-weight: bold;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-        ">
-            💕 Cliques: {st.session_state.click_count}/2
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Botão em posição aleatória com JavaScript para clicar no botão Streamlit
-        button_html = f"""
-        <style>
-            #random-button {{
-                position: fixed;
-                top: {st.session_state.button_position['top']}%;
-                left: {st.session_state.button_position['left']}%;
-                z-index: 9999;
-                background: linear-gradient(135deg, #ff6b9d, #c06c84);
-                color: white;
-                border: 3px solid white;
-                border-radius: 25px;
-                padding: 25px 50px;
-                font-size: 28px;
-                font-weight: bold;
-                font-family: 'Dancing Script', cursive;
-                cursor: pointer;
-                box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
-                animation: buttonPulse 2s ease-in-out infinite;
-                transition: all 0.3s ease;
-            }}
-            
-            #random-button:hover {{
-                transform: scale(1.1);
-                box-shadow: 0 12px 48px rgba(255, 105, 180, 0.7);
-            }}
-            
-            @keyframes buttonPulse {{
-                0%, 100% {{ transform: scale(1); }}
-                50% {{ transform: scale(1.08); }}
-            }}
-        </style>
-        
-        <button id="random-button" onclick="clickStreamlitButton()">
-            Clique Aqui
-        </button>
-        
-        <script>
-            function clickStreamlitButton() {{
-                // Encontrar e clicar no botão Streamlit oculto
-                const streamlitBtn = window.parent.document.querySelector('button[key="secret_click_btn"]') ||
-                                   window.parent.document.querySelector('button[data-testid*="secret"]') ||
-                                   Array.from(window.parent.document.querySelectorAll('button')).find(btn => btn.textContent.includes('🎯'));
-                
-                if (streamlitBtn) {{
-                    streamlitBtn.click();
-                }} else {{
-                    // Fallback: trigger pelo ID se existir
-                    const fallbackBtn = document.getElementById('secret-click-fallback');
-                    if (fallbackBtn) fallbackBtn.click();
-                }}
-            }}
-        </script>
-        """
-        
-        st.markdown(button_html, unsafe_allow_html=True)
-        
-        # Botão Streamlit OCULTO para capturar cliques
-        col1, col2, col3 = st.columns([10, 1, 10])
-        with col2:
-            if st.button("🎯", key="secret_click_btn", help="Clique no botão rosa!"):
-                st.session_state.click_count += 1
-                
-                # Na 3ª vez (após 2 cliques), vai para o pedido
-                if st.session_state.click_count >= 2:
-                    st.session_state.page = 'proposal'
-                    st.session_state.click_count = 0  # Reset
-                    st.session_state.progress_complete = False  # Reset
-                    st.rerun()
-                else:
-                    # Mudar posição do botão aleatoriamente
-                    st.session_state.button_position = {
-                        'top': random.randint(15, 75), 
-                        'left': random.randint(15, 75)
-                    }
-                    st.rerun()
 
 if __name__ == "__main__":
     main()

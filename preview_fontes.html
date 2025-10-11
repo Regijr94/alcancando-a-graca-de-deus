@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview de Fontes - Pedido de Casamento</title>
+    
+    <!-- Importar TODAS as fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@700&family=Pacifico&family=Sacramento&family=Allura&family=Alex+Brush&family=Tangerine:wght@700&family=Mr+Dafoe&family=Kaushan+Script&family=Cookie&family=Playfair+Display:wght@700&family=Cormorant+Garamond:wght@700&family=Cinzel:wght@700&family=Libre+Baskerville:wght@700&family=Crimson+Text:wght@700&family=EB+Garamond:wght@700&family=Montserrat:wght@700&family=Raleway:wght@700&family=Poppins:wght@700&family=Quicksand:wght@700&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ffecd2 100%);
+            padding: 40px 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            font-family: 'Great Vibes', cursive;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 32px;
+            margin: 40px 0 20px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .font-preview {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .font-preview:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+        }
+        
+        .font-name {
+            font-size: 18px;
+            color: #ff6b9d;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .intro-text {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .proposal-text {
+            font-size: 56px;
+            text-align: center;
+            color: #ff1493;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .message-text {
+            font-size: 36px;
+            text-align: center;
+            color: #666;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+        
+        /* Fontes individuais */
+        .great-vibes { font-family: 'Great Vibes', cursive; }
+        .dancing-script { font-family: 'Dancing Script', cursive; }
+        .pacifico { font-family: 'Pacifico', cursive; }
+        .sacramento { font-family: 'Sacramento', cursive; }
+        .allura { font-family: 'Allura', cursive; }
+        .alex-brush { font-family: 'Alex Brush', cursive; }
+        .tangerine { font-family: 'Tangerine', cursive; }
+        .mr-dafoe { font-family: 'Mr Dafoe', cursive; }
+        .kaushan { font-family: 'Kaushan Script', cursive; }
+        .cookie { font-family: 'Cookie', cursive; }
+        .playfair { font-family: 'Playfair Display', serif; }
+        .cormorant { font-family: 'Cormorant Garamond', serif; }
+        .cinzel { font-family: 'Cinzel', serif; }
+        .libre { font-family: 'Libre Baskerville', serif; }
+        .crimson { font-family: 'Crimson Text', serif; }
+        .eb-garamond { font-family: 'EB Garamond', serif; }
+        .montserrat { font-family: 'Montserrat', sans-serif; }
+        .raleway { font-family: 'Raleway', sans-serif; }
+        .poppins { font-family: 'Poppins', sans-serif; }
+        .quicksand { font-family: 'Quicksand', sans-serif; }
+        .nunito { font-family: 'Nunito', sans-serif; }
+        
+        .current {
+            border: 4px solid #ff6b9d;
+            background: rgba(255, 107, 157, 0.1);
+        }
+        
+        .current .font-name::after {
+            content: " (ATUAL)";
+            color: #ff1493;
+        }
+        
+        @media (max-width: 768px) {
+            .intro-text { font-size: 32px; }
+            .proposal-text { font-size: 40px; }
+            .message-text { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 Preview de Fontes 💕</h1>
+        <p class="subtitle">Escolha as fontes perfeitas para seu pedido de casamento</p>
+        
+        <!-- ROMÂNTICAS CURSIVAS -->
+        <h2 class="section-title">🌹 SUPER ROMÂNTICAS (Cursivas)</h2>
+        
+        <div class="font-preview current">
+            <div class="font-name">Great Vibes</div>
+            <div class="intro-text great-vibes">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text great-vibes">QUER CASAR COMIGO?</div>
+            <div class="message-text great-vibes">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview current">
+            <div class="font-name">Dancing Script</div>
+            <div class="intro-text dancing-script">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text dancing-script">QUER CASAR COMIGO?</div>
+            <div class="message-text dancing-script">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Pacifico</div>
+            <div class="intro-text pacifico">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text pacifico">QUER CASAR COMIGO?</div>
+            <div class="message-text pacifico">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Sacramento</div>
+            <div class="intro-text sacramento">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text sacramento">QUER CASAR COMIGO?</div>
+            <div class="message-text sacramento">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Allura</div>
+            <div class="intro-text allura">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text allura">QUER CASAR COMIGO?</div>
+            <div class="message-text allura">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Alex Brush</div>
+            <div class="intro-text alex-brush">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text alex-brush">QUER CASAR COMIGO?</div>
+            <div class="message-text alex-brush">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Tangerine</div>
+            <div class="intro-text tangerine" style="font-size: 64px;">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text tangerine" style="font-size: 72px;">QUER CASAR COMIGO?</div>
+            <div class="message-text tangerine" style="font-size: 48px;">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Mr Dafoe</div>
+            <div class="intro-text mr-dafoe">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text mr-dafoe">QUER CASAR COMIGO?</div>
+            <div class="message-text mr-dafoe">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Kaushan Script</div>
+            <div class="intro-text kaushan">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text kaushan">QUER CASAR COMIGO?</div>
+            <div class="message-text kaushan">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Cookie</div>
+            <div class="intro-text cookie">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text cookie">QUER CASAR COMIGO?</div>
+            <div class="message-text cookie">Você é o amor da minha vida</div>
+        </div>
+        
+        <!-- ELEGANTES -->
+        <h2 class="section-title">💍 ELEGANTES E SOFISTICADAS</h2>
+        
+        <div class="font-preview">
+            <div class="font-name">Playfair Display</div>
+            <div class="intro-text playfair">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text playfair">QUER CASAR COMIGO?</div>
+            <div class="message-text playfair">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Cormorant Garamond</div>
+            <div class="intro-text cormorant">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text cormorant">QUER CASAR COMIGO?</div>
+            <div class="message-text cormorant">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Cinzel</div>
+            <div class="intro-text cinzel">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text cinzel">QUER CASAR COMIGO?</div>
+            <div class="message-text cinzel">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Libre Baskerville</div>
+            <div class="intro-text libre">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text libre">QUER CASAR COMIGO?</div>
+            <div class="message-text libre">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Crimson Text</div>
+            <div class="intro-text crimson">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text crimson">QUER CASAR COMIGO?</div>
+            <div class="message-text crimson">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">EB Garamond</div>
+            <div class="intro-text eb-garamond">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text eb-garamond">QUER CASAR COMIGO?</div>
+            <div class="message-text eb-garamond">Você é o amor da minha vida</div>
+        </div>
+        
+        <!-- MODERNAS -->
+        <h2 class="section-title">❤️ MODERNAS E ROMÂNTICAS</h2>
+        
+        <div class="font-preview">
+            <div class="font-name">Montserrat</div>
+            <div class="intro-text montserrat">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text montserrat">QUER CASAR COMIGO?</div>
+            <div class="message-text montserrat">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Raleway</div>
+            <div class="intro-text raleway">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text raleway">QUER CASAR COMIGO?</div>
+            <div class="message-text raleway">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Poppins</div>
+            <div class="intro-text poppins">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text poppins">QUER CASAR COMIGO?</div>
+            <div class="message-text poppins">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Quicksand</div>
+            <div class="intro-text quicksand">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text quicksand">QUER CASAR COMIGO?</div>
+            <div class="message-text quicksand">Você é o amor da minha vida</div>
+        </div>
+        
+        <div class="font-preview">
+            <div class="font-name">Nunito</div>
+            <div class="intro-text nunito">
+                Meu amor, agora construí minha própria aplicação
+            </div>
+            <div class="proposal-text nunito">QUER CASAR COMIGO?</div>
+            <div class="message-text nunito">Você é o amor da minha vida</div>
+        </div>
+        
+        <div style="text-align: center; margin: 60px 0 20px;">
+            <p style="color: white; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                💕 Escolha suas favoritas e me avise! 💕
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

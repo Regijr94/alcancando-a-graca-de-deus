@@ -427,14 +427,24 @@ def show_intro_page():
     </style>
     """, unsafe_allow_html=True)
     
-    # Obter música para tocar
+    # Obter música para tocar - Alceu Valença na página inicial
     music_dir = "music"
     music_files = get_music_files(music_dir)
     music_base64 = None
     
     if music_files:
         try:
-            with open(music_files[0], "rb") as audio_file:
+            # Procurar especificamente pela música do Alceu Valença
+            alceu_music_file = None
+            for music_file in music_files:
+                if "Alceu" in music_file or "alceu" in music_file or "Belle" in music_file:
+                    alceu_music_file = music_file
+                    break
+            
+            # Se não encontrar Alceu, usar a primeira música
+            music_to_load = alceu_music_file if alceu_music_file else music_files[0]
+            
+            with open(music_to_load, "rb") as audio_file:
                 audio_bytes = audio_file.read()
                 music_base64 = base64.b64encode(audio_bytes).decode()
         except Exception as e:
@@ -826,7 +836,45 @@ def show_intro_page():
         </div>
         
         <!-- Player de música automático -->
-        """ + (f'<audio id="intro-music" autoplay loop style="display: none;"><source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg"></audio>' if music_base64 else '') + """
+        """ + (f'''<audio id="intro-music" loop style="display: none;">
+            <source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg">
+        </audio>
+        <script>
+            // Garantir que a música comece a tocar
+            (function() {{
+                const audioPlayer = document.getElementById('intro-music');
+                if (audioPlayer) {{
+                    // Função para tentar tocar
+                    const tryPlay = () => {{
+                        audioPlayer.play().then(() => {{
+                            console.log('Música do Alceu Valença iniciada!');
+                            localStorage.setItem('music_is_playing', 'true');
+                        }}).catch(e => {{
+                            console.log('Aguardando interação: ', e);
+                        }});
+                    }};
+                    
+                    // Tentar tocar imediatamente
+                    tryPlay();
+                    
+                    // Tentar novamente com delays
+                    setTimeout(tryPlay, 100);
+                    setTimeout(tryPlay, 300);
+                    setTimeout(tryPlay, 500);
+                    
+                    // Adicionar listeners para garantir que toque ao interagir
+                    const events = ['click', 'touchstart', 'keydown', 'mousemove'];
+                    events.forEach(event => {{
+                        document.addEventListener(event, function handler() {{
+                            if (audioPlayer.paused) {{
+                                tryPlay();
+                            }}
+                            events.forEach(e => document.removeEventListener(e, handler));
+                        }}, {{ once: true }});
+                    }});
+                }}
+            }})();
+        </script>''' if music_base64 else '') + """
         
         <script>
             const text1 = "Meu amor, sou grato a Deus por ter conhecido você!";
@@ -2516,7 +2564,21 @@ def show_gallery_page():
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
-                background: #000;
+                background: linear-gradient(135deg, 
+                    #ffecd2 0%, 
+                    #fcb69f 25%, 
+                    #ff9a9e 50%, 
+                    #fecfef 75%, 
+                    #ffecd2 100%
+                );
+                background-size: 400% 400%;
+                animation: gradientShift 25s ease infinite;
+            }}
+            
+            @keyframes gradientShift {{
+                0% {{ background-position: 0% 50%; }}
+                50% {{ background-position: 100% 50%; }}
+                100% {{ background-position: 0% 50%; }}
             }}
             #carousel-container {{
                 position: relative;

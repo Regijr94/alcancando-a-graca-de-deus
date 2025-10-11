@@ -55,6 +55,23 @@ st.markdown("""
         display: none;
     }
     
+    /* Esconder janela "Manage App" no canto inferior direito */
+    [data-testid="manage-app"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Esconder botão de gerenciar app */
+    [data-testid="stAppDeployButton"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Esconder qualquer elemento no canto inferior direito */
+    .stAppDeployButton {
+        display: none !important;
+    }
+    
     /* Ajustar padding */
     .main > div {
         padding-top: 0rem;

@@ -66,108 +66,20 @@ def add_global_music():
                 music_name = "Alceu Valença - La Belle de Jour"
             
             if selected_music:
-                # Criar chave segura para localStorage
-                music_key_safe = music_name.replace(" ", "_").replace("-", "_")
-                
-                # HTML com player de música específica por página
+                # HTML com player de música simples - toca automaticamente
                 music_html = f"""
-                <div id="global-music-player" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
-                    <audio id="audio-player" autoplay loop style="display: none;">
-                        <source src="data:audio/mpeg;base64,{selected_music}" type="audio/mpeg">
-                    </audio>
-                    
-                    <!-- Botão de controle de música -->
-                    <button id="music-toggle-btn" style="
-                        background: linear-gradient(135deg, #ff6b9d, #c06c84);
-                        border: 2px solid white;
-                        border-radius: 50%;
-                        width: 50px;
-                        height: 50px;
-                        font-size: 24px;
-                        cursor: pointer;
-                        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                        transition: all 0.3s ease;
-                        title: '{music_name}';
-                    ">
-                        🎵
-                    </button>
-                    
-                    <script>
-                        const audioPlayer = document.getElementById('audio-player');
-                        const toggleBtn = document.getElementById('music-toggle-btn');
-                        let isPlaying = false;
-                        
-                        // Salvar e restaurar posição da música entre recargas
-                        const MUSIC_KEY = 'music_position_{music_key_safe}';
-                        const MUSIC_PLAYING_KEY = 'music_playing';
-                        
-                        // Restaurar posição da música anterior
-                        const savedPosition = localStorage.getItem(MUSIC_KEY);
-                        const wasPlaying = localStorage.getItem(MUSIC_PLAYING_KEY) === 'true';
-                        if (savedPosition) {{
-                            audioPlayer.currentTime = parseFloat(savedPosition);
-                        }}
-                        
-                        // Salvar posição periodicamente
-                        setInterval(() => {{
-                            if (!audioPlayer.paused) {{
-                                localStorage.setItem(MUSIC_KEY, audioPlayer.currentTime);
-                                localStorage.setItem(MUSIC_PLAYING_KEY, 'true');
-                            }}
-                        }}, 1000);
-                        
-                        // Botão de play/pause
-                        toggleBtn.addEventListener('click', function() {{
-                            if (isPlaying) {{
-                                audioPlayer.pause();
-                                toggleBtn.textContent = '🎵';
-                                toggleBtn.style.background = 'linear-gradient(135deg, #999, #666)';
-                                localStorage.setItem(MUSIC_PLAYING_KEY, 'false');
-                            }} else {{
-                                audioPlayer.play();
-                                toggleBtn.textContent = '🎶';
-                                toggleBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c06c84)';
-                                localStorage.setItem(MUSIC_PLAYING_KEY, 'true');
-                            }}
-                            isPlaying = !isPlaying;
-                        }});
-                        
-                        // Hover effect
-                        toggleBtn.addEventListener('mouseenter', function() {{
-                            this.style.transform = 'scale(1.1)';
-                        }});
-                        toggleBtn.addEventListener('mouseleave', function() {{
-                            this.style.transform = 'scale(1)';
-                        }});
-                        
-                        // Tentar tocar automaticamente após um delay
+                <audio autoplay loop style="display: none;">
+                    <source src="data:audio/mpeg;base64,{selected_music}" type="audio/mpeg">
+                </audio>
+                <script>
+                    // Garantir que a música toque automaticamente
+                    const audioElements = document.querySelectorAll('audio');
+                    audioElements.forEach(audio => {{
                         setTimeout(() => {{
-                            // Se estava tocando antes, continuar
-                            if (wasPlaying || !savedPosition) {{
-                                audioPlayer.play()
-                                    .then(() => {{
-                                        isPlaying = true;
-                                        toggleBtn.textContent = '🎶';
-                                        console.log('🎵 Música iniciada/continuada: {music_name}');
-                                    }})
-                                    .catch(e => {{
-                                        console.log('⚠️ Autoplay bloqueado. Clique no botão 🎵 para tocar.');
-                                        toggleBtn.style.animation = 'pulse 1s infinite';
-                                    }});
-                            }}
-                        }}, 500);
-                        
-                        // Animação de pulse para chamar atenção
-                        const style = document.createElement('style');
-                        style.textContent = `
-                            @keyframes pulse {{
-                                0%, 100% {{ transform: scale(1); }}
-                                50% {{ transform: scale(1.15); }}
-                            }}
-                        `;
-                        document.head.appendChild(style);
-                    </script>
-                </div>
+                            audio.play().catch(e => console.log('Autoplay: usuário precisa interagir primeiro'));
+                        }}, 100);
+                    }});
+                </script>
                 """
                 st.markdown(music_html, unsafe_allow_html=True)
         except Exception as e:

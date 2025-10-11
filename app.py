@@ -1213,10 +1213,48 @@ def show_intro_page():
 def show_quiz_page():
     """Página do quiz romântico sobre o relacionamento"""
     
-    # CSS para fundo romântico
-    st.markdown("""
-    <style>
-        /* Fundo romântico para o quiz */
+    # Carregar fotos do diretório pictures para o mosaico
+    pictures_dir = "pictures"
+    image_files = get_image_files(pictures_dir)
+    
+    # Converter até 20 fotos aleatórias para base64
+    import random
+    selected_images = random.sample(image_files, min(20, len(image_files))) if image_files else []
+    images_base64 = []
+    
+    for img_path in selected_images:
+        img_b64 = image_to_base64(img_path, max_width=400)
+        if img_b64:
+            images_base64.append(img_b64)
+    
+    # Criar CSS do mosaico de fotos
+    mosaic_style = ""
+    if images_base64:
+        mosaic_images = ", ".join([f"url('{img}')" for img in images_base64[:12]])
+        mosaic_style = f"""
+        .stApp {{
+            background: 
+                linear-gradient(rgba(255, 236, 210, 0.90), rgba(252, 182, 159, 0.90)),
+                {mosaic_images};
+            background-size: 
+                cover,
+                {'25% 25%, ' * 12};
+            background-position: 
+                center,
+                0% 0%, 25% 0%, 50% 0%, 75% 0%,
+                0% 33%, 25% 33%, 50% 33%, 75% 33%,
+                0% 66%, 25% 66%, 50% 66%, 75% 66%;
+            background-repeat: no-repeat;
+            animation: mosaicShift 30s ease infinite !important;
+        }}
+        
+        @keyframes mosaicShift {{
+            0%, 100% {{ filter: brightness(1.05) saturate(1.1); }}
+            50% {{ filter: brightness(1.1) saturate(1.2); }}
+        }}
+        """
+    else:
+        mosaic_style = """
         .stApp {
             background: linear-gradient(135deg, 
                 #ffecd2 0%, 
@@ -1228,6 +1266,19 @@ def show_quiz_page():
             background-size: 400% 400% !important;
             animation: gradientShift 25s ease infinite !important;
         }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        """
+    
+    # CSS para fundo romântico com mosaico
+    st.markdown(f"""
+    <style>
+        /* Fundo romântico para o quiz com mosaico */
+        {mosaic_style}
     </style>
     """, unsafe_allow_html=True)
     
@@ -1394,17 +1445,19 @@ def show_quiz_page():
         <h1 style="
             font-family: 'Great Vibes', cursive;
             font-size: 64px;
-            color: #000;
-            text-shadow: 2px 2px 4px rgba(255,255,255,0.6);
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
             margin-bottom: 10px;
+            font-weight: bold;
         ">
             💕 Quiz do Nosso Amor 💕
         </h1>
         <p style="
             font-family: 'Dancing Script', cursive;
-            font-size: 28px;
-            color: #000;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+            font-size: 32px;
+            color: #34495e;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+            font-weight: bold;
         ">
             Pergunta {st.session_state.quiz_current_question + 1} de {total_questions}
         </p>
@@ -1414,23 +1467,24 @@ def show_quiz_page():
     # Container da pergunta atual
     st.markdown(f"""
     <div style="
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        padding: 40px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(15px);
+        border-radius: 25px;
+        border: 3px solid rgba(255, 255, 255, 0.9);
+        padding: 50px;
         margin: 40px auto;
-        max-width: 900px;
-        box-shadow: 0 8px 32px rgba(255, 105, 180, 0.2);
+        max-width: 950px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     ">
         <h3 style="
             font-family: 'Dancing Script', cursive;
-            font-size: 42px;
-            color: #000;
+            font-size: 44px;
+            color: #2c3e50;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
             margin-bottom: 30px;
             text-align: center;
-            line-height: 1.5;
+            line-height: 1.6;
+            font-weight: bold;
         ">
             {current_q['num']}. {current_q['question']}
         </h3>
@@ -1442,18 +1496,19 @@ def show_quiz_page():
     <style>
         /* Aumentar e centralizar opções de resposta */
         div[data-testid="stRadio"] {
-            max-width: 800px;
+            max-width: 900px;
             margin: 40px auto;
         }
         
         div[data-testid="stRadio"] > label {
             font-family: 'Dancing Script', cursive !important;
-            font-size: 28px !important;
-            color: #000 !important;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.5) !important;
-            margin-bottom: 20px !important;
+            font-size: 32px !important;
+            color: #2c3e50 !important;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8) !important;
+            margin-bottom: 25px !important;
             text-align: center !important;
             display: block !important;
+            font-weight: bold !important;
         }
         
         div[data-testid="stRadio"] > div {
@@ -1464,27 +1519,42 @@ def show_quiz_page():
         }
         
         div[data-testid="stRadio"] label[data-baseweb="radio"] {
-            background: rgba(255, 255, 255, 0.15) !important;
-            backdrop-filter: blur(10px) !important;
-            border-radius: 15px !important;
-            padding: 20px 30px !important;
-            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            background: rgba(255, 255, 255, 0.80) !important;
+            backdrop-filter: blur(12px) !important;
+            border-radius: 18px !important;
+            padding: 25px 40px !important;
+            border: 3px solid rgba(255, 182, 193, 0.5) !important;
             transition: all 0.3s ease !important;
-            min-width: 600px !important;
+            min-width: 650px !important;
             cursor: pointer !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
         }
         
         div[data-testid="stRadio"] label[data-baseweb="radio"]:hover {
-            background: rgba(255, 255, 255, 0.25) !important;
-            border-color: rgba(255, 182, 193, 0.6) !important;
-            transform: scale(1.02) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(255, 105, 180, 0.7) !important;
+            transform: scale(1.03) !important;
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.3) !important;
         }
         
         div[data-testid="stRadio"] label[data-baseweb="radio"] span {
             font-family: 'Dancing Script', cursive !important;
-            font-size: 24px !important;
-            color: #000 !important;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.5) !important;
+            font-size: 26px !important;
+            color: #2c3e50 !important;
+            text-shadow: 0.5px 0.5px 1px rgba(255,255,255,0.5) !important;
+            font-weight: bold !important;
+        }
+        
+        /* Responsivo para celular */
+        @media (max-width: 768px) {
+            div[data-testid="stRadio"] label[data-baseweb="radio"] {
+                min-width: 85% !important;
+                padding: 20px 30px !important;
+            }
+            
+            div[data-testid="stRadio"] label[data-baseweb="radio"] span {
+                font-size: 22px !important;
+            }
         }
     </style>
     """, unsafe_allow_html=True)
@@ -1507,7 +1577,17 @@ def show_quiz_page():
     
     # Mostrar popup se ativo
     if st.session_state.show_popup:
-        popup_color = "#90ee90" if st.session_state.popup_type == "success" else "#ff6b9d" if st.session_state.popup_type == "special" else "#ff6347"
+        # Cores mais escuras e com melhor contraste
+        if st.session_state.popup_type == "success":
+            popup_color = "#27ae60"  # Verde escuro
+            bg_gradient = "linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(209, 242, 209, 0.98))"
+        elif st.session_state.popup_type == "special":
+            popup_color = "#e74c3c"  # Rosa/vermelho escuro
+            bg_gradient = "linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 209, 220, 0.98))"
+        else:
+            popup_color = "#c0392b"  # Vermelho escuro
+            bg_gradient = "linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 200, 200, 0.98))"
+        
         st.markdown(f"""
         <div style="
             position: fixed;
@@ -1515,23 +1595,24 @@ def show_quiz_page():
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 9999;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 182, 193, 0.95));
+            background: {bg_gradient};
             backdrop-filter: blur(20px);
-            border-radius: 30px;
-            border: 3px solid {popup_color};
-            padding: 60px;
-            min-width: 500px;
+            border-radius: 35px;
+            border: 4px solid {popup_color};
+            padding: 70px;
+            min-width: 550px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.5);
             animation: popupBounce 0.5s ease-out;
         ">
             <p style="
                 font-family: 'Great Vibes', cursive;
-                font-size: 48px;
+                font-size: 52px;
                 color: {popup_color};
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+                text-shadow: 2px 2px 6px rgba(255,255,255,0.8);
                 margin: 0;
-                line-height: 1.4;
+                line-height: 1.5;
+                font-weight: bold;
             ">
                 {st.session_state.popup_message}
             </p>
@@ -1543,7 +1624,7 @@ def show_quiz_page():
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 9998;
         "></div>
         

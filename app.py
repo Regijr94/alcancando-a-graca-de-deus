@@ -9,7 +9,7 @@ from datetime import datetime
 
 # Configuração da página
 st.set_page_config(
-    page_title="Reginaldo e Beatriz - Galeria de Amor",
+    page_title="Reginaldo e Beatriz - Um história de amor",
     page_icon="💕",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -422,7 +422,7 @@ def show_intro_page():
             }}
             
             #typed-text {{
-                font-family: 'Great Vibes', cursive;
+                font-family: 'Allura', cursive;
                 font-size: 38px;
                 line-height: 1.5;
                 min-height: 350px;
@@ -473,7 +473,7 @@ def show_intro_page():
                 line-height: 1;
             }}
             #infinity-text {{
-                font-family: 'Great Vibes', cursive;
+                font-family: 'Allura', cursive;
                 font-size: 32px;
                 color: #fff;
                 text-shadow: 
@@ -646,8 +646,8 @@ def show_intro_page():
         """ + (f'<audio id="intro-music" autoplay loop style="display: none;"><source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg"></audio>' if music_base64 else '') + """
         
         <script>
-            const text1 = "Meu amor, agora construí minha própria aplicação";
-            const text2 = "Só para te dizer o quanto te amo, e sou feliz por ter você";
+            const text1 = "Meu amor, sou grato a Deus por ter conhecido você!";
+            const text2 = "O nosso amor seja puro, lindo e inigualável!";
             const typedTextElement = document.getElementById('typed-text');
             const infinityContainer = document.getElementById('infinity-container');
             let index = 0;
@@ -894,7 +894,7 @@ def show_intro_page():
             }
             
             #typed-text {
-                font-family: 'Great Vibes', cursive;
+                font-family: 'Allura', cursive;
                 font-size: 72px;
                 line-height: 1.5;
                 text-shadow: 
@@ -928,7 +928,7 @@ def show_intro_page():
             }
             
             #infinity-text {
-                font-family: 'Great Vibes', cursive;
+                font-family: 'Allura', cursive;
                 font-size: 52px;
                 color: #fff;
                 text-shadow: 
@@ -1538,7 +1538,7 @@ def show_proposal_page():
     <!DOCTYPE html>
     <html>
     <head>
-        <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cinzel:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
         <style>
             * {
                 margin: 0;
@@ -1636,7 +1636,7 @@ def show_proposal_page():
             }
             
             #message {
-                font-family: 'Great Vibes', cursive;
+                font-family: 'Cinzel', serif;
                 font-size: 52px;
                 line-height: 1.6;
                 text-shadow: 
@@ -1667,7 +1667,7 @@ def show_proposal_page():
             }
             
             #question {
-                font-family: 'Dancing Script', cursive;
+                font-family: 'Cinzel', serif;
                 font-size: 68px;
                 font-weight: 700;
                 color: #fff;
@@ -1789,6 +1789,7 @@ def show_proposal_page():
                 height: 80px;
                 font-size: 32px;
                 font-weight: bold;
+                font-family: 'Montserrat', sans-serif;
                 border-radius: 20px;
                 margin: 10px 0;
             }
@@ -1825,7 +1826,7 @@ def show_proposal_page():
                 animation: celebrationPop 0.6s ease-out;
             ">
                 <h1 style="
-                    font-family: 'Great Vibes', cursive;
+                    font-family: 'Cinzel', serif;
                     font-size: 72px;
                     color: white;
                     text-shadow: 4px 4px 8px rgba(0,0,0,0.5);

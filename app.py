@@ -1377,7 +1377,6 @@ def show_intro_page():
     </html>
     """
     
-    # Renderizar com components.html
     components.html(typing_html, height=700, scrolling=False)
     
     # Auto-avançar após tempo suficiente para todas as animações
@@ -1712,6 +1711,27 @@ def show_quiz_page():
             """, unsafe_allow_html=True)
             
             if st.button("💕 Clique Aqui 💕", key="go_to_proposal_btn", use_container_width=True):
+                # Adicionar transição suave
+                transition_html = """
+                <style>
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    
+                    .stApp {
+                        animation: fadeOut 0.8s ease-out forwards;
+                    }
+                </style>
+                <script>
+                    setTimeout(() => {
+                        window.parent.postMessage('transition_complete', '*');
+                    }, 800);
+                </script>
+                """
+                st.markdown(transition_html, unsafe_allow_html=True)
+                import time
+                time.sleep(0.9)
                 st.session_state.page = 'proposal'
                 st.rerun()
         
@@ -2035,9 +2055,20 @@ def show_proposal_page():
     except Exception as e:
         print(f"Erro ao carregar foto de fundo: {e}")
     
-    # CSS para fundo com foto
+    # CSS para fundo com foto e animação de entrada
     background_css = f"""
     <style>
+        @keyframes fadeInPage {{
+            from {{ 
+                opacity: 0; 
+                transform: scale(0.95);
+            }}
+            to {{ 
+                opacity: 1;
+                transform: scale(1);
+            }}
+        }}
+        
         .stApp {{
             background: 
                 linear-gradient(rgba(255, 154, 158, 0.6), rgba(252, 182, 159, 0.6)),
@@ -2045,10 +2076,22 @@ def show_proposal_page():
             background-size: cover !important;
             background-position: center !important;
             background-attachment: fixed !important;
+            animation: fadeInPage 1s ease-out forwards;
         }}
     </style>
     """ if background_image else """
     <style>
+        @keyframes fadeInPage {
+            from { 
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
         .stApp {
             background: linear-gradient(135deg, 
                 #ff9a9e 0%, 
@@ -2059,7 +2102,7 @@ def show_proposal_page():
                 #fecfef 100%
             ) !important;
             background-size: 400% 400% !important;
-            animation: gradientShift 25s ease infinite !important;
+            animation: fadeInPage 1s ease-out, gradientShift 25s ease infinite !important;
         }
     </style>
     """

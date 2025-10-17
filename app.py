@@ -1611,88 +1611,106 @@ def show_quiz_page():
             performance_msg = "VAMOS ESTUDAR<br>MAIS BEBÊ! 📚<br>Ainda temos tempo! 💝"
             emoji = "💕"
         
-        st.markdown(f"""
-        <div style="
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.4), rgba(255, 182, 193, 0.4));
-            backdrop-filter: blur(15px);
-            border-radius: 30px;
-            border: 3px solid rgba(255, 255, 255, 0.5);
-            padding: 40px;
-            margin: 40px 0;
-            text-align: center;
-            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.4);
-        ">
-            <h2 style="
-                font-family: 'Great Vibes', cursive;
-                font-size: 56px;
-                color: #fff;
-                text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-                margin-bottom: 20px;
-            ">
-                {emoji} Resultado Final {emoji}
-            </h2>
-            
+        # Usar components.html para garantir renderização correta
+        result_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+            <style>
+                body {{
+                    margin: 0;
+                    padding: 20px;
+                    font-family: 'Dancing Script', cursive;
+                }}
+            </style>
+        </head>
+        <body>
             <div style="
-                display: flex;
-                justify-content: center;
-                gap: 30px;
-                margin: 30px 0;
-                flex-wrap: wrap;
+                background: linear-gradient(135deg, rgba(255, 105, 180, 0.4), rgba(255, 182, 193, 0.4));
+                backdrop-filter: blur(15px);
+                border-radius: 30px;
+                border: 3px solid rgba(255, 255, 255, 0.5);
+                padding: 40px;
+                margin: 40px 0;
+                text-align: center;
+                box-shadow: 0 15px 50px rgba(255, 105, 180, 0.4);
             ">
-                <div style="
-                    background: rgba(255, 255, 255, 0.3);
-                    padding: 20px 40px;
-                    border-radius: 20px;
-                    backdrop-filter: blur(10px);
+                <h2 style="
+                    font-family: 'Great Vibes', cursive;
+                    font-size: 56px;
+                    color: #fff;
+                    text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+                    margin-bottom: 20px;
                 ">
-                    <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">✅ {correct_count}</p>
-                    <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Acertos</p>
-                </div>
+                    {emoji} Resultado Final {emoji}
+                </h2>
                 
                 <div style="
-                    background: rgba(255, 255, 255, 0.3);
-                    padding: 20px 40px;
-                    border-radius: 20px;
-                    backdrop-filter: blur(10px);
+                    display: flex;
+                    justify-content: center;
+                    gap: 30px;
+                    margin: 30px 0;
+                    flex-wrap: wrap;
                 ">
-                    <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">❌ {wrong_count}</p>
-                    <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Erros</p>
+                    <div style="
+                        background: rgba(255, 255, 255, 0.3);
+                        padding: 20px 40px;
+                        border-radius: 20px;
+                        backdrop-filter: blur(10px);
+                    ">
+                        <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">✅ {correct_count}</p>
+                        <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Acertos</p>
+                    </div>
+                    
+                    <div style="
+                        background: rgba(255, 255, 255, 0.3);
+                        padding: 20px 40px;
+                        border-radius: 20px;
+                        backdrop-filter: blur(10px);
+                    ">
+                        <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">❌ {wrong_count}</p>
+                        <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Erros</p>
+                    </div>
+                    
+                    <div style="
+                        background: rgba(255, 255, 255, 0.3);
+                        padding: 20px 40px;
+                        border-radius: 20px;
+                        backdrop-filter: blur(10px);
+                    ">
+                        <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">📊 {percentage:.0f}%</p>
+                        <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Nota</p>
+                    </div>
                 </div>
                 
-                <div style="
-                    background: rgba(255, 255, 255, 0.3);
-                    padding: 20px 40px;
-                    border-radius: 20px;
-                    backdrop-filter: blur(10px);
+                <p style="
+                    font-family: 'Great Vibes', cursive;
+                    font-size: 44px;
+                    color: #fff;
+                    text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+                    margin-top: 30px;
+                    line-height: 1.5;
                 ">
-                    <p style="font-size: 48px; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">📊 {percentage:.0f}%</p>
-                    <p style="font-size: 20px; margin: 5px 0 0 0; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Nota</p>
-                </div>
+                    {performance_msg}
+                </p>
+                
+                <p style="
+                    font-family: 'Dancing Script', cursive;
+                    font-size: 32px;
+                    color: #fff;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                    margin-top: 30px;
+                    line-height: 1.4;
+                ">
+                    Você é meu top picks,<br>minha preda bijú! 💕✨
+                </p>
             </div>
-            
-            <p style="
-                font-family: 'Great Vibes', cursive;
-                font-size: 44px;
-                color: #fff;
-                text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-                margin-top: 30px;
-                line-height: 1.5;
-            ">
-                {performance_msg}
-            </p>
-            
-            <p style="
-                font-family: 'Dancing Script', cursive;
-                font-size: 32px;
-                color: #fff;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                margin-top: 30px;
-                line-height: 1.4;
-            ">
-                Você é meu top picks,<br>minha preda bijú! 💕✨
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        </body>
+        </html>
+        """
+        
+        components.html(result_html, height=600, scrolling=False)
         
         # Adicionar espaço
         st.markdown("<br><br>", unsafe_allow_html=True)

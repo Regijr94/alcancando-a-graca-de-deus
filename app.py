@@ -840,38 +840,58 @@ def show_intro_page():
             <source src="data:audio/mpeg;base64,{music_base64}" type="audio/mpeg">
         </audio>
         <script>
-            // Garantir que a música comece a tocar
+            // Garantir que a música comece a tocar IMEDIATAMENTE
             (function() {{
                 const audioPlayer = document.getElementById('intro-music');
                 if (audioPlayer) {{
+                    // Configurar volume
+                    audioPlayer.volume = 0.7;
+                    
                     // Função para tentar tocar
                     const tryPlay = () => {{
                         audioPlayer.play().then(() => {{
-                            console.log('Música do Alceu Valença iniciada!');
+                            console.log('🎵 Música do Alceu Valença iniciada com sucesso!');
                             localStorage.setItem('music_is_playing', 'true');
+                            localStorage.setItem('music_current_time', '0');
                         }}).catch(e => {{
-                            console.log('Aguardando interação: ', e);
+                            console.log('⏳ Aguardando interação do usuário...', e);
                         }});
                     }};
                     
-                    // Tentar tocar imediatamente
+                    // Tentar tocar IMEDIATAMENTE
                     tryPlay();
                     
-                    // Tentar novamente com delays
+                    // Tentar múltiplas vezes com delays
+                    setTimeout(tryPlay, 50);
                     setTimeout(tryPlay, 100);
-                    setTimeout(tryPlay, 300);
+                    setTimeout(tryPlay, 200);
                     setTimeout(tryPlay, 500);
+                    setTimeout(tryPlay, 1000);
+                    setTimeout(tryPlay, 2000);
                     
-                    // Adicionar listeners para garantir que toque ao interagir
-                    const events = ['click', 'touchstart', 'keydown', 'mousemove'];
+                    // Adicionar listeners para QUALQUER interação
+                    const events = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll', 'focus', 'load'];
                     events.forEach(event => {{
                         document.addEventListener(event, function handler() {{
                             if (audioPlayer.paused) {{
+                                console.log('🎵 Tentando tocar música após interação:', event);
                                 tryPlay();
                             }}
+                            // Remover listener após sucesso
                             events.forEach(e => document.removeEventListener(e, handler));
                         }}, {{ once: true }});
                     }});
+                    
+                    // Tentar tocar quando a página carregar completamente
+                    window.addEventListener('load', tryPlay);
+                    document.addEventListener('DOMContentLoaded', tryPlay);
+                    
+                    // Salvar progresso da música
+                    setInterval(() => {{
+                        if (!audioPlayer.paused) {{
+                            localStorage.setItem('music_current_time', audioPlayer.currentTime.toString());
+                        }}
+                    }}, 1000);
                 }}
             }})();
         </script>''' if music_base64 else '') + """
